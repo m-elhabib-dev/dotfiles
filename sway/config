@@ -1,0 +1,236 @@
+
+# Catppuccin Mocha Colors
+
+set $rosewater #f5e0dc
+set $flamingo  #f2cdcd
+set $pink      #f5c2e7
+set $mauve     #cba6f7
+set $red       #f38ba8
+set $maroon    #eba0ac
+set $peach     #fab387
+set $yellow    #f9e2af
+set $green     #a6e3a1
+set $teal      #94e2d5
+set $sky       #89dceb
+set $sapphire  #74c7ec
+set $blue      #89b4fa
+set $lavender  #b4befe
+set $text      #cdd6f4
+set $subtext1  #bac2de
+set $subtext0  #a6adc8
+set $overlay2  #9399b2
+set $overlay1  #7f849c
+set $overlay0  #6c7086
+set $surface2  #585b70
+set $surface1  #45475a
+set $surface0  #313244
+set $base      #1e1e2e
+set $mantle    #181825
+set $crust     #11111b
+
+# Window Borders and Colors
+# target                 border     bg         text    indicator  child_border
+client.focused           $lavender  $base      $text   $rosewater $lavender
+client.focused_inactive  $overlay0  $base      $text   $rosewater $overlay0
+client.unfocused         $overlay0  $base      $text   $rosewater $overlay0
+client.urgent            $red       $base      $text   $rosewater $red
+client.placeholder       $overlay0  $base      $text   $rosewater $overlay0
+client.background        $base
+
+# Window title font
+font pango:JetBrains Mono 10
+
+# Key Variables
+set $mod Mod4
+set $term kitty
+set $menu wofi --show drun
+
+# Essential Shortcuts
+bindsym $mod+Shift+c reload
+bindsym $mod+Return exec $term
+bindsym $mod+Shift+q kill
+bindsym $mod+d exec wofi --show drun
+
+# Bar Toggle (Press Super+Shift+B if the bar disappears)
+bindsym $mod+Shift+B exec pkill waybar & waybar
+
+# Output Scaling
+output * scale 1.15
+
+# Input Settings
+input "type:touchpad" {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+}
+
+input type:keyboard {
+    xkb_layout "us,ara"
+    xkb_options caps:super
+}
+#bindsym $mod+space input type:keyboard xkb_switch_layout next
+# Moving around
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+
+# Move focuse contianer in the workspace
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10
+
+# size
+bindsym $mod+Ctrl+Left resize shrink width 10 px
+bindsym $mod+Ctrl+Up resize grow height 10 px
+bindsym $mod+Ctrl+Down resize shrink height 10 px
+bindsym $mod+Ctrl+Right resize grow width 10 px
+
+
+# Layout
+bindsym $mod+f fullscreen toggle
+bindsym $mod+v splitv
+bindsym $mod+h splith
+
+# Volume controls
+#bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+#bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+#bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+#
+## Brightness controls
+#bindsym XF86MonBrightnessUp exec brightnessctl set +10%
+#bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+
+# volume and brightness control using swayosd
+exec swayosd-server
+
+bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
+bindsym XF86AudioLowerVolume exec swayosd-client --output-volume lower
+bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
+
+bindsym XF86MonBrightnessUp exec swayosd-client --brightness raise
+bindsym XF86MonBrightnessDown exec swayosd-client --brightness lower
+
+
+# Toggle back and forth between the last two workspaces
+bindsym $mod+Tab workspace back_and_forth
+
+# Capture a portion of the screen to clipboard
+bindsym Shift+Print exec grim -g "$(slurp)" - | wl-copy
+
+# Capture full screen to a file in your Pictures folder
+bindsym Print exec grim ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).png
+
+bindsym $mod+Shift+Print exec flatpak run --env=__NV_PRIME_RENDER_OFFLOAD=1 --env=__GLX_VENDOR_LIBRARY_NAME=nvidia com.dec05eba.gpu_screen_recorder
+
+# My apps
+bindsym $mod+i exec firefox
+bindsym $mod+e exec nautilus
+
+# Power Operations Menu
+bindsym $mod+Shift+BackSpace exec ~/.local/bin/wofi-power
+
+# Battery Profile Menu
+bindsym $mod+Shift+Delete exec ~/.local/bin/wofi-battery
+
+# Notification Controls
+bindsym $mod+z exec makoctl dismiss
+bindsym $mod+Shift+z exec makoctl dismiss -a
+bindsym $mod+x exec makoctl invoke
+
+# Wallpaper Selector (Super + W)
+bindsym $mod+w exec ~/.local/bin/wofi-wallpaper
+
+# Clipboard History
+bindsym $mod+Menu exec clipman pick -t wofi
+
+# Toggle recording a selected area
+bindsym $mod+Shift+r exec ~/.local/bin/record-toggle
+
+# Record the entire screen
+bindsym $mod+Print exec wf-recorder -f ~/Videos/full_$(date +%Y%m%d_%H%M%S).mp4
+
+bindsym $mod+space exec ~/.local/bin/switch_layout
+
+
+
+
+# Space between windows
+gaps inner 4
+
+# Subtract the space from the screen edges
+gaps outer -4
+
+# Hide gaps entirely if only one window is open
+smart_gaps on
+
+# Hide borders when a single window is open
+smart_borders on
+
+# Use a thin border instead of title bars
+default_border pixel 2
+default_floating_border normal
+
+# Startup Applications
+exec waybar
+exec mako
+
+exec_always {
+    gsettings set org.gnome.desktop.interface gtk-theme 'Tahoe-Neo-Dark'
+    gsettings set org.gnome.desktop.interface icon-theme 'Tahoe-Neo-dark'
+    gsettings set org.gnome.desktop.interface cursor-theme 'Tahoe-Neo-light'
+}
+
+exec swaybg -i /home/pasha/sources/wallpapers/wallpaper2.jpg -m fill
+
+
+# Lock the screen after 5 minutes, turn off display after 10
+exec swayidle -w \
+     timeout 300 'swaylock -c 1e1e2e' \
+     timeout 600 'swaymsg "output * power off"' \
+     resume 'swaymsg "output * power on"' \
+     before-sleep 'swaylock -c 1e1e2e'
+
+exec gammastep -l 19.61:37.21 -t 6500:3500 -g 1.0 -m wayland &
+
+exec gammastep -l 19.61:37.21 -t 6500:3500 -g 1.0 -m wayland &
+
+# Start clipman to watch the clipboard
+exec wl-paste -t text --watch clipman store --max-items 500
+
+# Export variables for xdg-desktop-portal
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+exec blueman-applet
+
+# Chrome in workspace 9 always
+assign [class="Google-chrome"] workspace number 9
+assign [class="google-chrome"] workspace number 9
+assign [app_id="google-chrome"] workspace number 9

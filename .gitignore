@@ -1,0 +1,35 @@
+# Ignore everything
+*
+
+# But keep the .gitignore file itself
+!.gitignore
+
+# Allow specific directories/files
+!nvim/
+!nvim/**
+
+!alacritty/
+!alacritty/**
+
+!tmux/
+!tmux/**
+
+!starship.toml
+
+!sway/
+!sway/**
+
+!waybar/
+!waybar/**
+
+!wofi/
+!wofi/**
+
+!mako/
+!mako/**
+
+!yazi/
+!yazi/**
+
+!kitty/
+!kitty/**

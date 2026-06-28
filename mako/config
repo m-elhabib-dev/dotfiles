@@ -1,0 +1,29 @@
+# Global Settings
+font=SF Pro Display 11
+background-color=#1e1e2e
+text-color=#cdd6f4
+border-color=#cba6f7
+border-size=2
+border-radius=10
+width=300
+height=100
+margin=10
+padding=15
+default-timeout=5000
+format=<b>%s</b>\n%b
+# Progress bar (Volume/Brightness)
+progress-color=over #a6e3a1
+
+# Urgency States
+[urgency=low]
+border-color=#89b4fa
+default-timeout=3000
+
+[urgency=normal]
+border-color=#cba6f7
+
+[urgency=critical]
+border-color=#f38ba8
+background-color=#f38ba8
+text-color=#1e1e2e
+default-timeout=0

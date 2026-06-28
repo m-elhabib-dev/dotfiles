@@ -1,0 +1,16 @@
+[mgr]
+
+prepend_keymap = [
+    { on = "T", run = "tab_create --current", desc = "New tab" },
+
+    { on = ["g", "r"], run = "cd /", desc = "Go root" },
+    { on = ["g", "h"], run = "cd ~", desc = "Go home" },
+    { on = ["g", "c"], run = "cd ~/.config", desc = "Go config" },
+    { on = ["g", "d"], run = "cd ~/Downloads", desc = "Go downloads" },
+
+    { on = "E", run = "shell '$EDITOR \"$@\"' --block", desc = "Edit" },
+
+    { on = "!", run = 'shell "$SHELL" --block', desc = "Open shell here" },
+
+    { on = "<C-n>", run = "create", desc = "Create file" },
+]

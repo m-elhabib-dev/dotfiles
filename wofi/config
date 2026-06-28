@@ -1,0 +1,12 @@
+width=500
+height=600
+location=center
+show=drun
+prompt=Search Apps...
+filter_rate=100
+allow_images=true
+image_size=24
+term=alacritty
+hide_scroll=true
+print_command=true
+insensitive=true

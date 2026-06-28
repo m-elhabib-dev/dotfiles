@@ -1,0 +1,26 @@
+[manager]
+cwd = { fg = "#89b4fa", bold = true }
+
+hovered = { bg = "#313244", bold = true }
+preview_hovered = { bg = "#313244", bold = true }
+
+find_keyword = { fg = "#f9e2af", bold = true }
+find_position = { fg = "#fab387", bold = true }
+
+marker_selected = { fg = "#a6e3a1", bg = "#a6e3a1" }
+marker_copied = { fg = "#89b4fa", bg = "#89b4fa" }
+marker_cut = { fg = "#f38ba8", bg = "#f38ba8" }
+
+tab_active = { fg = "#1e1e2e", bg = "#89b4fa", bold = true }
+tab_inactive = { fg = "#cdd6f4", bg = "#181825" }
+
+border_symbol = "│"
+border_style = { fg = "#45475a" }
+
+[status]
+separator_open = ""
+separator_close = ""
+
+progress_label = { fg = "#cdd6f4", bold = true }
+progress_normal = { fg = "#89b4fa", bg = "#313244" }
+progress_error = { fg = "#f38ba8", bg = "#313244" }

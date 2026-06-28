@@ -1,0 +1,45 @@
+* {
+    font-family: "SF Pro Display", sans-serif;
+    font-size: 14px;
+}
+
+window {
+    margin: 0px;
+    border: 2px solid #cba6f7; /* Mauve border */
+    background-color: #1e1e2e; /* Base background */
+    border-radius: 10px;
+}
+
+#outer-box {
+    margin: 5px;
+    padding: 10px;
+    background-color: #1e1e2e;
+}
+
+#input {
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    color: #cdd6f4; /* Text color */
+    background-color: #313244; /* Surface0 background */
+    border-radius: 5px;
+}
+
+#inner-box {
+    margin: 5px;
+    background-color: #1e1e2e;
+}
+
+#entry:selected {
+    background-color: #cba6f7; /* Mauve highlight */
+    border-radius: 5px;
+}
+
+#text {
+    margin: 5px;
+    color: #cdd6f4;
+}
+
+#text:selected {
+    color: #1e1e2e; /* Dark text on light background */
+}
