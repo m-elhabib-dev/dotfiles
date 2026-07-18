@@ -230,6 +230,12 @@ exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
 exec blueman-applet
 
+# Always place Slack on workspace 8
+assign [app_id="slack"] workspace number 8
+
+# Start Slack when Sway starts
+exec_always --no-startup-id slack
+
 # Chrome in workspace 9 always
 assign [class="Google-chrome"] workspace number 9
 assign [class="google-chrome"] workspace number 9
