@@ -38,7 +38,7 @@ client.placeholder       $overlay0  $base      $text   $rosewater $overlay0
 client.background        $base
 
 # Window title font
-font pango:JetBrains Mono 10
+font pango:JetBrains Mono 7
 
 # Key Variables
 set $mod Mod4
@@ -151,7 +151,7 @@ bindsym $mod+Shift+Print exec flatpak run --env=__NV_PRIME_RENDER_OFFLOAD=1 --en
 
 # My apps
 bindsym $mod+i exec firefox
-bindsym $mod+e exec nautilus
+bindsym $mod+e exec nautilus 
 
 # Power Operations Menu
 bindsym $mod+Shift+BackSpace exec ~/.local/bin/wofi-power

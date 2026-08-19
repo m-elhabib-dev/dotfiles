@@ -28,3 +28,13 @@ opt.number = true
 opt.relativenumber = true
 opt.termguicolors = true
 opt.autowriteall = true
+
+
+opt.termguicolors = true
+
+
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.lsp.foldexpr()"
+opt.foldlevel = 99
+opt.foldlevelstart = 99
+opt.foldenable = true

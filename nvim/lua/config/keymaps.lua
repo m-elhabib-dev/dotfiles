@@ -14,3 +14,12 @@ keymap("n", "<leader>ca", function()
 end, {
     desc = "Code Action",
 })
+
+keymap("n", "<S-l>", "<Cmd>BufferLineCycleNext<CR>")
+keymap("n", "<S-h>", "<Cmd>BufferLineCyclePrev<CR>")
+
+
+keymap("n", "<leader>sv", "<C-w>v", { desc = "Vertical split" })
+keymap("n", "<leader>sh", "<C-w>s", { desc = "Horizontal split" })
+keymap("n", "<leader>se", "<C-w>=", { desc = "Equalize splits" })
+keymap("n", "<leader>sx", "<Cmd>close<CR>", { desc = "Close split" })
