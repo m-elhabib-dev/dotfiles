@@ -207,7 +207,8 @@ exec_always {
     gsettings set org.gnome.desktop.interface cursor-theme 'Tahoe-Neo-light'
 }
 
-exec swaybg -i /home/pasha/sources/wallpapers/wallpaper2.jpg -m fill
+# exec swaybg -i /home/pasha/sources/wallpapers/wallpaper2.jpg -m fill
+exec swaybg -i /home/pasha/sources/wallpapers/wallpaper.png -m fill
 
 
 # Lock the screen after 5 minutes, turn off display after 10
