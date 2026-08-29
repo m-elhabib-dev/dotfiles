@@ -90,7 +90,6 @@ window#waybar {
 #language {
     padding: 0 7px;
     margin: 3px 1px;
-    border-radius: 8px;
 }
 
 
@@ -202,6 +201,17 @@ window#waybar {
 
 #tray {
     background-color: alpha(@surface0, 0.45);
+}
+
+
+/* =========================
+   Separator
+   ========================= */
+
+#custom-sep {
+    color: @overlay1;
+    padding: 0 2px;
+    margin: 3px 0;
 }
 
 

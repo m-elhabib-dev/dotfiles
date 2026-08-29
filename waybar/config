@@ -12,12 +12,19 @@
     ],
     "modules-right": [
         "disk",
+        "custom/sep",
         "cpu",
+        "custom/sep",
         "memory",
+        "custom/sep",
         "custom/gpu",
+        "custom/sep",
         "backlight",
+        "custom/sep",
         "pulseaudio",
+        "custom/sep",
         "battery",
+        "custom/sep",
         "tray",
     	"sway/language"
     ],
@@ -30,6 +37,11 @@
 
     "tray": {
         "spacing": 10
+    },
+
+    "custom/sep": {
+        "format": "|",
+        "tooltip": false
     },
 
     "clock": {
