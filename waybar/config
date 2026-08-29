@@ -11,6 +11,7 @@
         "clock"
     ],
     "modules-right": [
+        "disk",
         "cpu",
         "memory",
         "custom/gpu",
@@ -36,7 +37,12 @@
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
-
+"disk": {
+    "path": "/",
+    "format": " {free}",
+    "tooltip-format": "Used: {used}\nFree: {free}\nTotal: {total}",
+    "interval": 10
+},
     "cpu": {
         "format": "CPU {usage}%",
         "tooltip": false
@@ -95,4 +101,5 @@
         },
         "on-click": "pavucontrol"
     }
+
 }

@@ -26,6 +26,10 @@
 @define-color crust #11111b;
 
 
+/* =========================
+   Global
+   ========================= */
+
 * {
     font-family: "JetBrains Mono", "Font Awesome 6 Free";
     font-size: 13px;
@@ -34,17 +38,27 @@
     border-radius: 0;
 }
 
+
+/* =========================
+   Waybar
+   ========================= */
+
 window#waybar {
     background-color: @base;
     color: @text;
     border-bottom: 2px solid @mauve;
 }
 
+
+/* =========================
+   Workspaces
+   ========================= */
+
 #workspaces button {
     padding: 0 8px;
     color: @text;
-    transition: all 0.2s ease;
     background-color: transparent;
+    transition: all 0.2s ease;
 }
 
 #workspaces button.focused {
@@ -55,12 +69,18 @@ window#waybar {
 
 #workspaces button:hover {
     color: @text;
-    background: @mauve;
+    background-color: @mauve;
 }
+
+
+/* =========================
+   Modules
+   ========================= */
 
 #clock,
 #cpu,
 #memory,
+#disk,
 #custom-gpu,
 #battery,
 #backlight,
@@ -68,26 +88,60 @@ window#waybar {
 #pulseaudio,
 #tray,
 #language {
-    padding: 0 14px;
-    margin: 4px 4px;
-    border-radius: 10px;
+    padding: 0 7px;
+    margin: 3px 1px;
+    border-radius: 8px;
 }
+
+
+/* =========================
+   Clock
+   ========================= */
 
 #clock {
     color: @yellow;
 }
 
+
+/* =========================
+   CPU
+   ========================= */
+
 #cpu {
     color: @blue;
 }
+
+
+/* =========================
+   Memory
+   ========================= */
 
 #memory {
     color: @yellow;
 }
 
+
+/* =========================
+   Disk
+   ========================= */
+
+#disk {
+    color: @sapphire;
+}
+
+
+/* =========================
+   GPU
+   ========================= */
+
 #custom-gpu {
     color: @teal;
 }
+
+
+/* =========================
+   Battery
+   ========================= */
 
 #battery {
     color: @green;
@@ -101,6 +155,11 @@ window#waybar {
     color: @red;
 }
 
+
+/* =========================
+   Network
+   ========================= */
+
 #network {
     color: @green;
 }
@@ -109,17 +168,46 @@ window#waybar {
     color: @red;
 }
 
+
+/* =========================
+   Audio
+   ========================= */
+
 #pulseaudio {
     color: @teal;
 }
+
+
+/* =========================
+   Backlight
+   ========================= */
 
 #backlight {
     color: @peach;
 }
 
-#tray {
-    background-color: alpha(@surface, 0.45);
+
+/* =========================
+   Language
+   ========================= */
+
+#language {
+    color: @lavender;
 }
+
+
+/* =========================
+   Tray
+   ========================= */
+
+#tray {
+    background-color: alpha(@surface0, 0.45);
+}
+
+
+/* =========================
+   Tooltips
+   ========================= */
 
 tooltip {
     background-color: @mantle;
