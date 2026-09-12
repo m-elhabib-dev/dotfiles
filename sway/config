@@ -43,6 +43,7 @@ font pango:JetBrains Mono 7
 # Key Variables
 set $mod Mod4
 set $term kitty
+#set $term alacritty
 set $menu wofi --show drun
 
 # Essential Shortcuts
@@ -134,10 +135,11 @@ bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
 bindsym XF86AudioLowerVolume exec swayosd-client --output-volume lower
 bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
 
-bindsym XF86MonBrightnessUp exec swayosd-client --brightness raise
-bindsym XF86MonBrightnessDown exec swayosd-client --brightness lower
+# bindsym XF86MonBrightnessUp exec swayosd-client --brightness raise
+# bindsym XF86MonBrightnessDown exec swayosd-client --brightness lower
 
-
+bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness-both up
+bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness-both down
 # Toggle back and forth between the last two workspaces
 bindsym $mod+Tab workspace back_and_forth
 
@@ -212,13 +214,11 @@ exec swaybg -i /home/pasha/sources/wallpapers/wallpaper.png -m fill
 
 
 # Lock the screen after 5 minutes, turn off display after 10
-exec swayidle -w \
-     timeout 300 'swaylock -c 1e1e2e' \
-     timeout 600 'swaymsg "output * power off"' \
-     resume 'swaymsg "output * power on"' \
-     before-sleep 'swaylock -c 1e1e2e'
-
-exec gammastep -l 19.61:37.21 -t 6500:3500 -g 1.0 -m wayland &
+# exec swayidle -w \
+#      timeout 300 'swaylock -c 1e1e2e' \
+#      timeout 600 'swaymsg "output * power off"' \
+#      resume 'swaymsg "output * power on"' \
+#      before-sleep 'swaylock -c 1e1e2e'
 
 exec gammastep -l 19.61:37.21 -t 6500:3500 -g 1.0 -m wayland &
 
