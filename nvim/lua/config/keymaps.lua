@@ -23,3 +23,9 @@ keymap("n", "<leader>sv", "<C-w>v", { desc = "Vertical split" })
 keymap("n", "<leader>sh", "<C-w>s", { desc = "Horizontal split" })
 keymap("n", "<leader>se", "<C-w>=", { desc = "Equalize splits" })
 keymap("n", "<leader>sx", "<Cmd>close<CR>", { desc = "Close split" })
+
+
+keymap("n", "<Up>", "<Nop>")
+keymap("n", "<Down>", "<Nop>")
+keymap("n", "<Left>", "<Nop>")
+keymap("n", "<Right>", "<Nop>")

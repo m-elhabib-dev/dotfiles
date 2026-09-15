@@ -71,10 +71,16 @@ input type:keyboard {
 }
 #bindsym $mod+space input type:keyboard xkb_switch_layout next
 # Moving around
-bindsym $mod+Left focus left
-bindsym $mod+Down focus down
-bindsym $mod+Up focus up
-bindsym $mod+Right focus right
+#bindsym $mod+Left focus left
+#bindsym $mod+Down focus down
+#bindsym $mod+Up focus up
+#bindsym $mod+Right focus right
+# Move focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
 
 # Workspaces
 bindsym $mod+1 workspace number 1
@@ -89,10 +95,10 @@ bindsym $mod+9 workspace number 9
 bindsym $mod+0 workspace number 10
 
 # Move focuse contianer in the workspace
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
-bindsym $mod+Shift+Right move right
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
 
 
 # Move focused container to workspace
@@ -108,10 +114,10 @@ bindsym $mod+Shift+9 move container to workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10
 
 # size
-bindsym $mod+Ctrl+Left resize shrink width 10 px
-bindsym $mod+Ctrl+Up resize grow height 10 px
-bindsym $mod+Ctrl+Down resize shrink height 10 px
-bindsym $mod+Ctrl+Right resize grow width 10 px
+bindsym $mod+Ctrl+h resize shrink width 10 px
+bindsym $mod+Ctrl+k resize grow height 10 px
+bindsym $mod+Ctrl+j resize shrink height 10 px
+bindsym $mod+Ctrl+l resize grow width 10 px
 
 
 # Layout
@@ -125,8 +131,8 @@ bindsym $mod+h splith
 #bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 #
 ## Brightness controls
-#bindsym XF86MonBrightnessUp exec brightnessctl set +10%
-#bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+bindsym XF86MonBrightnessUp exec brightnessctl set +10%
+bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
 
 # volume and brightness control using swayosd
 exec swayosd-server
@@ -138,8 +144,8 @@ bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
 # bindsym XF86MonBrightnessUp exec swayosd-client --brightness raise
 # bindsym XF86MonBrightnessDown exec swayosd-client --brightness lower
 
-bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness-both up
-bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness-both down
+#bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness-both up
+#bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness-both down
 # Toggle back and forth between the last two workspaces
 bindsym $mod+Tab workspace back_and_forth
 
@@ -180,7 +186,8 @@ bindsym $mod+Print exec wf-recorder -f ~/Videos/full_$(date +%Y%m%d_%H%M%S).mp4
 
 bindsym $mod+space exec ~/.local/bin/switch_layout
 
-
+bindsym $mod+Shift+F11 exec doas ddcutil setvcp 10 + 5
+bindsym $mod+Shift+F12 exec doas ddcutil setvcp 10 - 5
 
 
 # Space between windows
