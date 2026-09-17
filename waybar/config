@@ -13,12 +13,11 @@
     "modules-right": [
         "disk",
         "custom/sep",
-        "cpu",
+        "custom/cpu",
         "custom/sep",
         "memory",
         "custom/sep",
         "custom/gpu",
-        "custom/sep",
         "backlight",
         "custom/sep",
         "pulseaudio",
@@ -45,7 +44,7 @@
     },
 
     "clock": {
-        "format": "{:%H:%M  |  %A, %b %d}",
+        "format": "{:%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
@@ -55,8 +54,9 @@
     "tooltip-format": "Used: {used}\nFree: {free}\nTotal: {total}",
     "interval": 10
 },
-    "cpu": {
-        "format": "CPU {usage}%",
+    "custom/cpu": {
+        "exec": "~/.config/waybar/scripts/cpu.sh",
+        "interval": 5,
         "tooltip": false
     },
 
@@ -70,8 +70,7 @@
     },
 
     "custom/gpu": {
-        "exec": "nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits",
-        "format": "GPU {} MiB",
+        "exec": "~/.config/waybar/scripts/gpu.sh",
         "interval": 5,
         "tooltip": false
     },

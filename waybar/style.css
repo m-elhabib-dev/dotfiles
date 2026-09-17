@@ -83,7 +83,7 @@ window#waybar {
 }
 
 #disk,
-#cpu,
+#custom-cpu,
 #memory,
 #custom-gpu,
 #backlight,
@@ -110,7 +110,7 @@ window#waybar {
    CPU
    ========================= */
 
-#cpu {
+#custom-cpu {
     color: @flamingo;
 }
 
