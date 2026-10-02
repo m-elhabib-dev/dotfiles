@@ -32,7 +32,7 @@
 
 * {
     font-family: "JetBrains Mono", "Font Awesome 6 Free";
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     border: none;
     border-radius: 0;
@@ -47,6 +47,14 @@ window#waybar {
     background-color: @base;
     color: @text;
     border-bottom: 2px solid @mauve;
+}
+
+box.modules-left {
+    min-width: 618px;
+}
+
+box.modules-right {
+    min-width: 1051px;
 }
 
 
@@ -78,6 +86,7 @@ window#waybar {
    ========================= */
 
 #clock,
+#custom-powermode,
 #network {
     padding: 0 5px;
 }
@@ -156,6 +165,23 @@ window#waybar {
 
 #battery.critical {
     color: @red;
+}
+
+
+/* =========================
+   Power mode
+   ========================= */
+
+#custom-powermode.battery {
+    color: @green;
+}
+
+#custom-powermode.performance {
+    color: @red;
+}
+
+#custom-powermode.custom {
+    color: @yellow;
 }
 
 

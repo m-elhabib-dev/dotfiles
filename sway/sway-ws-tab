@@ -1,0 +1,45 @@
+#!/bin/bash
+# Per-output workspace back-and-forth for sway.
+#   watch  track the previously shown workspace on each output (run via exec_always)
+#   back   switch to the previous workspace on the focused output
+#   other  focus the visible workspace on the other output
+dir="${XDG_RUNTIME_DIR:-/tmp}/sway-ws-tab"
+mkdir -p "$dir"
+
+case "$1" in
+watch)
+    # Only one watcher; extra copies started by exec_always on reload just exit
+    exec 9>"$dir/lock"
+    flock -n 9 || exit 0
+
+    declare -A visible
+    while IFS=$'\t' read -r out ws; do
+        visible[$out]=$ws
+    done < <(swaymsg -t get_workspaces 9>&- | jq -r '.[] | select(.visible) | "\(.output)\t\(.name)"')
+
+    while IFS=$'\t' read -r out ws; do
+        if [[ -n ${visible[$out]} && ${visible[$out]} != "$ws" ]]; then
+            printf '%s\n' "${visible[$out]}" > "$dir/$out"
+        fi
+        visible[$out]=$ws
+    done < <(swaymsg -mrt subscribe '["workspace"]' 9>&- |
+        jq --unbuffered -r 'select(.change == "focus") | "\(.current.output)\t\(.current.name)"')
+    ;;
+back)
+    out=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
+    prev=$(cat "$dir/$out" 2>/dev/null)
+    [[ -n $prev ]] || exit 0
+    # Never leave this output, even if that workspace has since moved elsewhere
+    swaymsg -t get_workspaces |
+        jq -e --arg n "$prev" --arg o "$out" 'any(.[]; .name == $n and .output != $o)' >/dev/null && exit 0
+    swaymsg workspace "\"$prev\""
+    ;;
+other)
+    target=$(swaymsg -t get_outputs | jq -r '[.[] | select(.active and (.focused | not))][0].name // empty')
+    [[ -n $target ]] && swaymsg focus output "$target"
+    ;;
+*)
+    echo "usage: ${0##*/} watch|back|other" >&2
+    exit 1
+    ;;
+esac

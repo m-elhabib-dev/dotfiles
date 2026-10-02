@@ -5,10 +5,9 @@
     "spacing": 0,
     "modules-left": [
         "sway/workspaces",
+        "custom/powermode",
+        "custom/sep",
         "network"
-    ],
-    "modules-center": [
-        "clock"
     ],
     "modules-right": [
         "disk",
@@ -25,7 +24,10 @@
         "battery",
         "custom/sep",
         "tray",
-    	"sway/language"
+        "custom/sep",
+    	"sway/language",
+        "custom/sep",
+        "clock"
     ],
 
     "sway/workspaces": {
@@ -43,10 +45,7 @@
         "tooltip": false
     },
 
-    "clock": {
-        "format": "{:%H:%M}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-    },
+"clock": { "format": "<span color='#89dceb'>{0:%Y-%m-%d}</span> <span color='#6c7086'>|</span> <span color='#f9e2af'>{0:%H:%M}</span>", "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>" },
 
 "disk": {
     "path": "/",
@@ -69,6 +68,12 @@
     "format": "{short}"
     },
 
+    "custom/powermode": {
+        "exec": "~/.config/waybar/scripts/powermode.sh",
+        "return-type": "json",
+        "interval": 5
+    },
+
     "custom/gpu": {
         "exec": "~/.config/waybar/scripts/gpu.sh",
         "interval": 5,
@@ -85,7 +90,7 @@
             "warning": 30,
             "critical": 15
         },
-        "format": "{icon} {capacity}%",
+        "format": "{icon} {capacity}% {power:.0f}W",
         "format-charging": " {capacity}%",
         "format-plugged": " {capacity}%",
         "format-icons": ["", "", "", "", ""]
