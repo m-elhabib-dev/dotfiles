@@ -1,0 +1,24 @@
+(defpoll time :interval "1s" `date +%H:%M`)
+(defpoll date :interval "60s" `date "+%A, %B %-d"`)
+(defvar tone "dark")
+
+(defwindow clock [mon]
+  :monitor mon
+  :stacking "bg"
+  :focusable false
+  :exclusive false
+  :windowtype "desktop"
+  :geometry (geometry
+    :x "0px"
+    :y "90px"
+    :anchor "top center"
+    :width "560px"
+    :height "300px")
+
+  (box :class "clock-box ${tone}"
+       :orientation "v"
+       :halign "center"
+       :valign "start"
+       :space-evenly false
+    (label :class "time" :halign "center" :text time)
+    (label :class "date" :halign "center" :text date)))
