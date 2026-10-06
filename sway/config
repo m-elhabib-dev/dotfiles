@@ -137,6 +137,9 @@ bindsym $mod+f fullscreen toggle
 # volume and brightness control using swayosd
 exec swayosd-server
 
+# desktop clock widget (eww, background layer)
+exec_always ~/.local/bin/eww-start
+
 bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
 bindsym XF86AudioLowerVolume exec swayosd-client --output-volume lower
 bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
