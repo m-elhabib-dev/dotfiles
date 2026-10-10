@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Define options
+options="Lock\nSuspend\nLogout\nReboot\nPower Off"
+
+# Show menu and get selection
+chosen=$(echo -e "$options" | wofi -dmenu -p "System Power" --width 300 --height 250)
+
+# Execute command based on choice
+case $chosen in
+    "Lock")
+        swaylock -c 1e1e2e ;;
+    "Suspend")
+        systemctl suspend ;;
+    "Logout")
+        swaymsg exit ;;
+    "Reboot")
+        systemctl reboot ;;
+    "Power Off")
+        systemctl poweroff ;;
+esac

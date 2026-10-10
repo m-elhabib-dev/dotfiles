@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Daily dev cleanup. Usage: dev-cleanup [-n|--dry-run] [--claude-hours H] [--shell-hours H] [--ssh-hours H] [--services]
+# Never touches its own ancestors (so it is safe to run from inside a claude session/terminal).
+set -u
+
+DRY=0; CLAUDE_H=0; SHELL_H=12; SSH_H=6; SERVICES=0
+while [ $# -gt 0 ]; do
+  case $1 in
+    -n|--dry-run) DRY=1 ;;
+    --claude-hours) CLAUDE_H=$2; shift ;;   # 0 = leave claude sessions alone
+    --shell-hours) SHELL_H=$2; shift ;;
+    --ssh-hours) SSH_H=$2; shift ;;
+    --services) SERVICES=1 ;;               # stop mariadb + docker (needs sudo)
+    *) echo "unknown arg $1"; exit 1 ;;
+  esac; shift
+done
+
+# protect our ancestor chain
+declare -A KEEP
+p=$$; while [ "$p" -gt 1 ]; do KEEP[$p]=1; p=$(ps -o ppid= -p "$p" | tr -d ' '); [ -z "$p" ] && break; done
+
+freed=0
+reap() { # pid reason
+  local pid=$1 why=$2 rss
+  [ -n "${KEEP[$pid]:-}" ] && return
+  rss=$(ps -o rss= -p "$pid" | tr -d ' '); [ -z "$rss" ] && return
+  printf '%s pid=%s %sMB  %s\n' "$([ $DRY = 1 ] && echo WOULD-KILL || echo KILL)" "$pid" "$((rss/1024))" "$why"
+  freed=$((freed+rss))
+  [ $DRY = 1 ] || kill "$pid" 2>/dev/null
+}
+
+# 1. chrome-devtools-mcp tree (Firefox-only user)
+for pid in $(pgrep -u "$USER" -f 'chrome-devtools-mcp'); do reap "$pid" "chrome-devtools-mcp"; done
+
+# 2. old claude sessions (opt-in)
+if [ "$CLAUDE_H" -gt 0 ]; then
+  for pid in $(pgrep -u "$USER" -x claude); do
+    age=$(ps -o etimes= -p "$pid" | tr -d ' ')
+    [ "${age:-0}" -gt $((CLAUDE_H*3600)) ] && reap "$pid" "claude session older than ${CLAUDE_H}h"
+  done
+fi
+
+# 3. idle shells: no children, older than SHELL_H
+for pid in $(pgrep -u "$USER" -x zsh; pgrep -u "$USER" -x bash); do
+  age=$(ps -o etimes= -p "$pid" | tr -d ' ')
+  [ "${age:-0}" -gt $((SHELL_H*3600)) ] || continue
+  pgrep -P "$pid" >/dev/null && continue
+  reap "$pid" "idle shell >${SHELL_H}h"
+done
+
+# 4. stale ssh sessions
+for pid in $(pgrep -u "$USER" -x ssh); do
+  age=$(ps -o etimes= -p "$pid" | tr -d ' ')
+  [ "${age:-0}" -gt $((SSH_H*3600)) ] && reap "$pid" "ssh >${SSH_H}h: $(ps -o args= -p "$pid" | cut -c1-60)"
+done
+
+# 5. optional services
+if [ $SERVICES = 1 ]; then
+  echo "$([ $DRY = 1 ] && echo WOULD-STOP || echo STOP) mariadb docker"
+  [ $DRY = 1 ] || sudo systemctl disable --now mariadb docker docker.socket
+fi
+
+# 6. report listeners still open
+echo "--- listening ports:"; ss -tlnH | awk '{print "  "$4}'
+echo "freed ~$((freed/1024)) MB"

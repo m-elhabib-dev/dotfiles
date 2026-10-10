@@ -1,0 +1,34 @@
+#!/bin/bash
+# Set eww clock colors from the wallpaper: tone (light|dark) from brightness behind the clock
+# (bottom-center), text colors from the wallpaper's most vivid prominent color.
+img="$1"
+[[ -f "$img" ]] || exit 0
+mean=$(magick "$img" -gravity south -crop 40%x30%+0+0 +repage -colorspace Gray -format "%[fx:mean]" info: 2>/dev/null) || exit 0
+tone=dark
+awk -v m="$mean" 'BEGIN{exit !(m>0.55)}' && tone=light
+
+# accent: of 8 quantized colors, the best chroma * sqrt(pixel count), skipping near-grays
+acc=$(magick "$img" -alpha off -resize 64x64 -colors 8 -depth 8 -format "%c" histogram:info: 2>/dev/null | awk '
+  { gsub(/[(),]/, " "); n = $1; r = $2; g = $3; b = $4
+    mx = r; if (g > mx) mx = g; if (b > mx) mx = b
+    mn = r; if (g < mn) mn = g; if (b < mn) mn = b
+    s = (mx - mn) * sqrt(n)
+    if (mx - mn >= 40 && s > best) { best = s; out = substr($5, 1, 7) } }
+  END { print out }')
+
+# accent hue at HSL lightness $1, saturation fx $2
+shade() {
+    magick xc:"$acc" -colorspace HSL -channel B -fx "$1" -channel G -fx "$2" +channel \
+        -colorspace sRGB -depth 8 -format "#%[hex:u.p{0,0}]" info:
+}
+
+if [[ -z $acc ]]; then
+    # gray wallpaper: Catppuccin defaults
+    if [[ $tone == light ]]; then time_color="#313244" date_color="#11111b"
+    else time_color="#b4befe" date_color="#a6adc8"; fi
+elif [[ $tone == light ]]; then
+    time_color=$(shade 0.28 "max(u,0.5)") date_color=$(shade 0.22 "u*0.6")
+else
+    time_color=$(shade 0.80 "max(u,0.5)") date_color=$(shade 0.70 "u*0.6")
+fi
+eww update tone="$tone" time_color="$time_color" date_color="$date_color"

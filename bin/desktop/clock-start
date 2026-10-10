@@ -1,0 +1,8 @@
+#!/bin/bash
+# Start eww desktop widgets. The daemon gets an empty XDG_CONFIG_HOME so the user's
+# ~/.config/gtk-3.0/gtk.css (window { background: @base }) doesn't paint behind the widgets.
+eww kill 2>/dev/null
+XDG_CONFIG_HOME="$HOME/.cache/eww-gtk" eww -c "$HOME/.config/eww" daemon || exit 1
+eww open clock --id clock-edp --arg mon=eDP-1
+eww open clock --id clock-hdmi --arg mon=HDMI-A-1
+~/.local/bin/clock-colors "$(cat ~/.config/sway/wallpaper 2>/dev/null)"

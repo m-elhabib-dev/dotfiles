@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# video-browser: browse videos with wofi, play with mpv.
+# usage: video-browser [dir]   (default ~/Videos)
+
+dir=$(realpath -- "${1:-$HOME/Videos}") || exit 1
+[[ -d $dir ]] || { echo "not a directory: $dir" >&2; exit 1; }
+# start in $dir, but allow going up to $HOME (or $dir itself if outside home)
+root=$HOME
+[[ $dir == "$HOME" || $dir == "$HOME"/* ]] || root=$dir
+
+exts='mkv|mp4|webm|mov|avi|m4v|flv|ts|wmv'
+shopt -s nullglob nocaseglob
+
+# icons from the GTK icon theme (same as nautilus)
+theme=$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | tr -d "'")
+find_icon() {
+    local t d f
+    for t in "$theme" Adwaita hicolor; do
+        for d in "$HOME/.local/share/icons/$t" "/usr/share/icons/$t"; do
+            for f in "$@"; do
+                [[ -e $d/$f ]] && { printf '%s' "$d/$f"; return; }
+            done
+        done
+    done
+}
+icon_dir=$(find_icon places/scalable/folder.svg places/48/folder.svg places/64/folder.svg places/symbolic/folder-symbolic.svg)
+icon_video=$(find_icon mimes/scalable/video-x-generic.svg mimes/48/video-x-generic.svg mimes/64/video-x-generic.svg)
+icon_up=$(find_icon actions/24/go-up.svg actions/symbolic/go-up-symbolic.svg)
+
+# wofi dmenu entry with icon: img:<path>:text:<label>
+entry() { if [[ -n $1 ]]; then printf 'img:%s:text:%s\n' "$1" "$2"; else printf '%s\n' "$2"; fi; }
+
+while :; do
+    labels=() paths=() icons=()
+    if [[ $dir != "$root" ]]; then
+        labels+=("..")
+        icons+=("$icon_up")
+        paths+=("$(dirname -- "$dir")")
+    fi
+
+    for p in "$dir"/*/; do
+        p=${p%/}
+        labels+=("${p##*/}/")
+        icons+=("$icon_dir")
+        paths+=("$p")
+    done
+
+    for p in "$dir"/*; do
+        [[ -f $p ]] || continue
+        [[ ${p##*.} =~ ^($exts)$ ]] || continue
+        labels+=("${p##*/}")
+        icons+=("$icon_video")
+        paths+=("$p")
+    done
+
+    if ((${#labels[@]} == 0)); then
+        labels+=("(empty)")
+        icons+=("")
+        paths+=("$dir")
+    fi
+
+    choice=$(for i in "${!labels[@]}"; do entry "${icons[i]}" "${labels[i]}"; done | wofi --allow-images --dmenu -i -p "${dir/#$HOME/\~}") || exit 0
+    choice=${choice#img:*:text:}
+    [[ -n $choice ]] || exit 0
+
+    target=
+    for i in "${!labels[@]}"; do
+        if [[ ${labels[i]} == "$choice" ]]; then
+            target=${paths[i]}
+            break
+        fi
+    done
+    [[ -n $target ]] || continue
+
+    if [[ -d $target ]]; then
+        dir=$target
+    elif [[ -f $target ]]; then
+        mpv --force-window=yes -- "$target"
+    fi
+done

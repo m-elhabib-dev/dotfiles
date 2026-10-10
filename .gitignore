@@ -40,3 +40,8 @@
 
 !eww/
 !eww/**
+
+!bin/
+!bin/**
+
+!install.sh

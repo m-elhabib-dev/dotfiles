@@ -123,7 +123,7 @@ bindsym $mod+Ctrl+l resize grow width 10 px
 # Layout
 bindsym $mod+f fullscreen toggle
 #bindsym $mod+v splitv
-bindsym $mod+v exec ~/.local/bin/vview
+bindsym $mod+v exec ~/.local/bin/video-browser
 #bindsym $mod+h splith
 
 # Volume controls
@@ -139,28 +139,26 @@ bindsym $mod+v exec ~/.local/bin/vview
 exec swayosd-server
 
 # desktop clock widget (eww, bottom layer)
-exec_always ~/.local/bin/eww-start
+exec_always ~/.local/bin/clock-start
 
 bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
 bindsym XF86AudioLowerVolume exec swayosd-client --output-volume lower
 bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
 
-# brightness-ctl adjusts the internal panel (brightnessctl) and any DDC/CI
+# brightness adjusts the internal panel (brightnessctl) and any DDC/CI
 # external monitors (ddcutil) together, then shows one swayosd OSD
-bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness-ctl raise
-bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness-ctl lower
+bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness raise
+bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness lower
 
 # hold $mod while turning the volume knob to control brightness instead
-bindsym $mod+XF86AudioRaiseVolume exec ~/.local/bin/brightness-ctl raise
-bindsym $mod+XF86AudioLowerVolume exec ~/.local/bin/brightness-ctl lower
+bindsym $mod+XF86AudioRaiseVolume exec ~/.local/bin/brightness raise
+bindsym $mod+XF86AudioLowerVolume exec ~/.local/bin/brightness lower
 
-#bindsym XF86MonBrightnessUp exec ~/.local/bin/brightness-both up
-#bindsym XF86MonBrightnessDown exec ~/.local/bin/brightness-both down
 # $mod+Tab: back and forth between the last two workspaces on THIS screen
 # $mod+Shift+Tab: jump to the active workspace on the other screen
-exec_always ~/.local/bin/sway-ws-tab watch
-bindsym $mod+Tab exec ~/.local/bin/sway-ws-tab back
-bindsym $mod+Shift+Tab exec ~/.local/bin/sway-ws-tab other
+exec_always ~/.local/bin/workspace-toggle watch
+bindsym $mod+Tab exec ~/.local/bin/workspace-toggle back
+bindsym $mod+Shift+Tab exec ~/.local/bin/workspace-toggle other
 
 # Screenshots & recording (save to file + clipboard)
 #   $mod+F9        full screenshot (focused monitor)
@@ -169,22 +167,22 @@ bindsym $mod+Shift+Tab exec ~/.local/bin/sway-ws-tab other
 #   $mod+Shift+F10 toggle area recording
 bindsym $mod+F9 exec ~/.local/bin/screenshot full
 bindsym $mod+Shift+F9 exec ~/.local/bin/screenshot area
-bindsym $mod+F10 exec ~/.local/bin/record-toggle full
-bindsym $mod+Shift+F10 exec ~/.local/bin/record-toggle area
+bindsym $mod+F10 exec ~/.local/bin/screen-record full
+bindsym $mod+Shift+F10 exec ~/.local/bin/screen-record area
 # Print-key aliases
 bindsym Print exec ~/.local/bin/screenshot full
 bindsym Shift+Print exec ~/.local/bin/screenshot area
-bindsym $mod+Print exec ~/.local/bin/record-toggle full
+bindsym $mod+Print exec ~/.local/bin/screen-record full
 
 # My apps
 bindsym $mod+i exec firefox
 bindsym $mod+e exec nautilus 
 
 # Power Operations Menu
-bindsym $mod+Shift+BackSpace exec ~/.local/bin/wofi-power
+bindsym $mod+Shift+BackSpace exec ~/.local/bin/session-menu
 
 # Battery Profile Menu
-bindsym $mod+Shift+Delete exec ~/.local/bin/wofi-battery
+bindsym $mod+Shift+Delete exec ~/.local/bin/power-profile-menu
 
 # Notification Controls
 bindsym $mod+z exec makoctl dismiss
@@ -192,12 +190,12 @@ bindsym $mod+Shift+z exec makoctl dismiss -a
 bindsym $mod+x exec makoctl invoke
 
 # Wallpaper Selector (Super + W)
-bindsym $mod+w exec ~/.local/bin/wofi-wallpaper
+bindsym $mod+w exec ~/.local/bin/wallpaper-pick
 
 # Clipboard History
 bindsym $mod+Control+c exec clipman pick -t wofi
 
-bindsym $mod+space exec ~/.local/bin/switch_layout
+bindsym $mod+space exec ~/.local/bin/keyboard-layout-next
 
 bindsym $mod+Shift+F11 exec doas ddcutil setvcp 10 + 5
 bindsym $mod+Shift+F12 exec doas ddcutil setvcp 10 - 5

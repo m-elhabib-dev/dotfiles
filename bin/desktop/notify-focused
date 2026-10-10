@@ -1,0 +1,13 @@
+#!/bin/bash
+# notify-focused <notify-send args>: show the notification on the currently focused monitor (mako)
+cfg="$HOME/.config/mako/config"
+out=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
+if [ -n "$out" ] && ! grep -qx "output=$out" "$cfg"; then
+    if grep -q '^output=' "$cfg"; then
+        sed -i "s|^output=.*|output=$out|" "$cfg"
+    else
+        sed -i "1i output=$out" "$cfg"
+    fi
+    makoctl reload
+fi
+exec notify-send "$@"

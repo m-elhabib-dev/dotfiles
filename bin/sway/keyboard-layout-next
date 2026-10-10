@@ -1,0 +1,4 @@
+#!/bin/bash
+swaymsg input type:keyboard xkb_switch_layout next
+LAYOUT=$(swaymsg -t get_inputs | jq -r '.[] | select(.type=="keyboard") | .xkb_active_layout_name' | head -n 1)
+swayosd-client --custom-message "$LAYOUT" --custom-icon input-keyboard-symbolic

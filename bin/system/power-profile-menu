@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Define options
+options="Performance\nBattery"
+
+# Show menu
+chosen=$(echo -e "$options" | wofi -dmenu -p "Power Mode" --width 300 --height 140)
+
+# Execute command (GPU switch may need a reboot; see power-profile output)
+case $chosen in
+    "Performance")
+        kitty --hold ~/.local/bin/power-profile performance ;;
+    "Battery")
+        kitty --hold ~/.local/bin/power-profile battery ;;
+esac

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Waybar custom module: shows current power mode (set by ~/.local/bin/powermode).
+# Waybar custom module: shows current power mode (set by ~/.local/bin/power-profile).
 
 no_turbo=$(cat /sys/devices/system/cpu/intel_pstate/no_turbo 2>/dev/null)
 epp=$(cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference 2>/dev/null)

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ $# -ne 1 ] && [ $# -ne 2 ] && [ $# -ne 3 ]
+then
+echo "Usage: yt-download <url> [resolution] [-a]"
+exit 1
+fi
+
+url="$1"
+resolution="1080"
+audio_format=""
+
+if [ $# -eq 2 ]
+then
+resolution="$2"
+fi
+
+if [ "$3" = "-a" ]
+then
+audio_format="mp3"
+fi
+
+output_dir="$HOME/Videos/Youtube"
+
+if echo "$url" | grep -q "list="
+then
+output_template="$output_dir/%(playlist_title)s/%(title)s.%(ext)s"
+else
+output_template="$output_dir/%(title)s.%(ext)s"
+fi
+
+mkdir -p "$output_dir"
+
+if [ "$audio_format" != "" ]
+then
+echo "Downloading Audio"
+yt-dlp -o "$output_template" --extract-audio --audio-format "$audio_format" "$url"  --cookies-from-browser firefox
+else
+echo "Downloading Video at ${resolution}p"
+yt-dlp -o "$output_template" -S "res:$resolution" "$url"  --cookies-from-browser firefox
+fi
+
+

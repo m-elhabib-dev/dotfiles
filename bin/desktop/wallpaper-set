@@ -1,0 +1,8 @@
+#!/bin/bash
+# Set the wallpaper (sway output bg) and save it to ~/.config/sway/wallpaper.
+# With no argument, re-apply the saved one (run from sway config on start/reload).
+STATE="$HOME/.config/sway/wallpaper"
+img="${1:-$(cat "$STATE" 2>/dev/null)}"
+[[ -f "$img" ]] || exit 0
+[[ -n $1 ]] && printf '%s\n' "$img" > "$STATE"
+swaymsg "output * bg '$img' fill" >/dev/null

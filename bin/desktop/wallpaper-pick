@@ -1,0 +1,34 @@
+#!/bin/bash
+
+WALLPAPER_DIR="$HOME/sources/wallpapers"
+CACHE_DIR="$HOME/.cache/wofi-wallpaper"
+THUMB_W=250
+THUMB_H=141
+
+mkdir -p "$CACHE_DIR"
+
+generate_thumbnail() {
+    local input="$1"
+    local output="$2"
+    magick "$input" -thumbnail "${THUMB_W}x${THUMB_H}^" -gravity center -extent "${THUMB_W}x${THUMB_H}" "$output"
+}
+
+SELECTION=$(for img in "$WALLPAPER_DIR"/*; do
+    [[ -f "$img" ]] || continue
+    thumb="$CACHE_DIR/$(basename "$img").png"
+    if [[ ! -f "$thumb" ]] || [[ "$img" -nt "$thumb" ]]; then
+        generate_thumbnail "$img" "$thumb"
+    fi
+    echo -en "img:$thumb\n"
+done | wofi --show dmenu --allow-images --insensitive \
+    --define image_size="$THUMB_W" \
+    --columns 3 \
+    --cache-file /dev/null \
+    --width 1000 --height 800 \
+    --prompt "Select Wallpaper")
+
+if [ -n "$SELECTION" ]; then
+    orig="$WALLPAPER_DIR/$(basename "${SELECTION#img:}" .png)"
+    ~/.local/bin/wallpaper-set "$orig"
+    ~/.local/bin/clock-colors "$orig"
+fi

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+MODE="$(envycontrol -q 2>/dev/null)"
+
+NVIDIA_BASE=""
+for c in /sys/class/drm/card*; do
+    [ -e "$c/device" ] || continue
+    case "$(readlink -f "$c/device")" in
+        */0000:01:00.0) NVIDIA_BASE=$(basename "$c") ;;
+    esac
+done
+
+if [ "$MODE" = "nvidia" ]; then
+    exec sway --unsupported-gpu
+fi
+
+if [ -n "$NVIDIA_BASE" ]; then
+    for s in /sys/class/drm/${NVIDIA_BASE}-*/status; do
+        [ -e "$s" ] || continue
+        if [ "$(cat "$s")" = "connected" ]; then
+            exec sway --unsupported-gpu
+        fi
+    done
+fi
+
+for c in /sys/class/drm/card*; do
+    [ -e "$c/device" ] || continue
+    case "$(readlink -f "$c/device")" in
+        */0000:00:02.0)
+            exec env WLR_DRM_DEVICES=/dev/dri/$(basename "$c") sway
+            ;;
+    esac
+done
+
+exec sway

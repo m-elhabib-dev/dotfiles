@@ -146,6 +146,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias home='cd ~'
 alias c='clear'
+alias cls='clear && printf "\033[3J"'
 
 # Listing
 alias ls='eza --icons --group-directories-first'
@@ -178,7 +179,6 @@ alias mkdir='mkdir -p'
 # Search
 alias grep='grep --color=auto'
 alias ff='fastfetch'
-alias find='fd'
 
 # Networking
 alias ping='ping -c 5'
@@ -221,7 +221,16 @@ alias shutdown='systemctl poweroff'
 # manage GPU
 alias gpu-on='sudo envycontrol --switch nvidia'
 alias gpu-off='sudo envycontrol --switch integrated'
-alias gpu-hyprid='sudo envycontrol --switch hyprid'
+alias gpu-hybrid='sudo envycontrol --switch hybrid'
+alias performance='power-profile performance && reboot'
+alias battery='power-profile battery && poweroff'
+
+
+alias yt-dlp='yt-download'
+alias nit='/home/pasha/Rust/nit/target/release/nit'
+alias e='exit'
+
+
 
 # opencode
 export PATH=/home/pasha/.opencode/bin:$PATH
@@ -231,3 +240,9 @@ export EDITOR=vim
 export VISUAL=vim
 
 export ANDROID_HOME=$HOME/Android/Sdk
+
+
+
+if [[ -z "$TMUX" && -o interactive ]]; then
+    exec tmux
+fi

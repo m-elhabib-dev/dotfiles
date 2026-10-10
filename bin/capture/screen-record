@@ -1,0 +1,55 @@
+#!/bin/bash
+# screen-record [full|area] -> start/stop screen recording (H.264/AAC MP4, 1080p max, 30fps)
+state="${XDG_RUNTIME_DIR:-/tmp}/record-toggle.file"
+bar() { pkill -RTMIN+8 -x waybar; }
+
+if pgrep -x wf-recorder >/dev/null; then
+    pkill -INT -x wf-recorder
+    "$HOME/.local/bin/notify-focused" -a Recording -i media-record -h string:x-canonical-private-synchronous:rec "Recording stopped" "Finalizing video..."
+    while pgrep -x wf-recorder >/dev/null; do sleep 0.2; done
+    file=$(cat "$state" 2>/dev/null)
+    # move the moov atom to the front so it streams/plays everywhere
+    if [ -s "$file" ] && ffmpeg -v error -y -i "$file" -c copy -movflags +faststart "$file.tmp.mp4"; then
+        mv "$file.tmp.mp4" "$file"
+    fi
+    bar
+    "$HOME/.local/bin/notify-focused" -a Recording -i "${file:+video-x-generic}" -h string:x-canonical-private-synchronous:rec "Recording saved" "$(basename "$file")"
+    exit 0
+fi
+
+dir="$HOME/Videos/Recordings"
+mkdir -p "$dir"
+file="$dir/rec_$(date +%Y%m%d_%H%M%S).mp4"
+
+# even dimensions, never above 1080p, yuv420p (max player compatibility)
+filter="scale='min(1920,iw)':'min(1080,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2"
+
+case "${1:-full}" in
+    full)
+        out=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
+        target=(-o "$out")
+        ;;
+    area)
+        geom=$(slurp) || exit 0
+        target=(-g "$geom")
+        ;;
+    *) echo "usage: screen-record [full|area]" >&2; exit 2 ;;
+esac
+
+# system audio = monitor of the default sink
+sink=$(pactl get-default-sink 2>/dev/null)
+audio=()
+[ -n "$sink" ] && audio=(--audio="${sink}.monitor" --audio-backend=pulse -C aac)
+
+echo "$file" > "$state"
+setsid -f wf-recorder "${target[@]}" "${audio[@]}" -f "$file" \
+    -c libx264 -x yuv420p -r 30 -F "$filter" \
+    -p color_range=mpeg -p preset=veryfast -p crf=23 -p profile=high -p level=4.1 \
+    >/dev/null 2>&1
+sleep 0.5
+if pgrep -x wf-recorder >/dev/null; then
+    bar
+    "$HOME/.local/bin/notify-focused" -a Recording -i media-record -h string:x-canonical-private-synchronous:rec "Recording started" "$(basename "$file")  -  press Super+F10 to stop"
+else
+    "$HOME/.local/bin/notify-focused" -u critical -a Recording -i dialog-error "Recording failed" "wf-recorder did not start"
+fi

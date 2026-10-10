@@ -1,0 +1,89 @@
+#!/bin/bash
+# Adjusts brightness on the internal laptop panel (via brightnessctl) and any
+# DDC/CI-capable external monitors (via ddcutil), then shows one swayosd OSD.
+set -uo pipefail
+
+STEP=5
+DIR="${1:-}"
+BUS_CACHE="$HOME/.cache/brightness-ctl-buses"
+PCT_CACHE="$HOME/.cache/brightness-ctl-pct"
+LOCKFILE="$HOME/.cache/brightness-ctl.lock"
+
+case "$DIR" in
+    raise) SIGN=1 ;;
+    lower) SIGN=-1 ;;
+    *) echo "usage: brightness raise|lower" >&2; exit 1 ;;
+esac
+
+if command -v brightnessctl >/dev/null && brightnessctl -c backlight -l >/dev/null 2>&1; then
+    brightnessctl -c backlight set "${STEP}%$([ "$SIGN" = 1 ] && echo + || echo -)" >/dev/null 2>&1
+fi
+
+# `ddcutil detect` does a full I2C bus scan and can take 30-60s+, so the
+# external monitors' bus numbers are detected once and cached, instead of
+# rescanning on every key press.
+# Only one scan may run at a time (a scan holds the I2C bus; concurrent scans
+# and writes make each other fail), and it is capped with a timeout.
+detect_buses() {
+    timeout 20 ddcutil detect --brief 2>/dev/null | grep -A1 '^Display [0-9]' \
+        | grep -oE '/dev/i2c-[0-9]+' | grep -oE '[0-9]+$'
+}
+
+SCANLOCK="$HOME/.cache/brightness-ctl-scan.lock"
+FAILFILE="$HOME/.cache/brightness-ctl-fails"
+mkdir -p "$(dirname "$BUS_CACHE")"
+if [ ! -s "$BUS_CACHE" ]; then
+    (
+        flock -n 201 || exit 0
+        tmp=$(detect_buses)
+        [ -n "$tmp" ] && echo "$tmp" > "$BUS_CACHE"
+    ) 201>"$SCANLOCK"
+fi
+
+FIRST_BUS=$(head -n1 "$BUS_CACHE" 2>/dev/null)
+
+if [ -n "$FIRST_BUS" ]; then
+    CUR_PCT=$(cat "$PCT_CACHE" 2>/dev/null)
+    if [ -z "$CUR_PCT" ]; then
+        # one-time real read (only run once ever, or after a failed write)
+        # to seed the tracked value - every call after this is instant.
+        CUR_PCT=$(ddcutil -b "$FIRST_BUS" getvcp 10 2>/dev/null | grep -oP 'current value =\s*\K[0-9]+')
+        [ -z "$CUR_PCT" ] && CUR_PCT=50
+    fi
+    NEW_PCT=$(( CUR_PCT + SIGN * STEP ))
+    [ "$NEW_PCT" -lt 0 ] && NEW_PCT=0
+    [ "$NEW_PCT" -gt 100 ] && NEW_PCT=100
+    echo "$NEW_PCT" > "$PCT_CACHE"
+    PCT="$NEW_PCT"
+
+    # Fire-and-forget: the DDC/CI write to the monitor takes ~100ms+ over
+    # I2C, so it's sent in the background instead of blocking the OSD on it.
+    # Rapid presses (e.g. spinning the knob fast) queue up several of these
+    # concurrently with no guaranteed completion order, so each one waits its
+    # turn on the lock and then, if a *later* press has since overwritten
+    # PCT_CACHE, skips its now-stale write entirely - only ever the most
+    # recently requested value actually reaches the monitor.
+    # On failure (monitor unplugged/moved port) the caches are cleared so the
+    # next key press reseeds/rescans instead of drifting silently.
+    (
+        flock -w 5 200 || exit 1
+        [ "$(cat "$PCT_CACHE" 2>/dev/null)" = "$NEW_PCT" ] || exit 0
+        while read -r bus; do
+            [ -z "$bus" ] && continue
+            if ddcutil -b "$bus" --noverify --skip-ddc-checks setvcp 10 "$NEW_PCT" >/dev/null 2>&1 \
+               || { sleep 0.3; ddcutil -b "$bus" --noverify --skip-ddc-checks setvcp 10 "$NEW_PCT" >/dev/null 2>&1; }; then
+                rm -f "$FAILFILE"
+            else
+                # only rescan after 2 consecutive failed presses, not one
+                if [ -e "$FAILFILE" ]; then rm -f "$BUS_CACHE" "$PCT_CACHE" "$FAILFILE"; else : > "$FAILFILE"; fi
+            fi
+        done < "$BUS_CACHE"
+    ) 200>"$LOCKFILE" & disown
+else
+    PCT=$(brightnessctl -c backlight -m 2>/dev/null | cut -d, -f4 | tr -d '%')
+fi
+
+if [ -n "${PCT:-}" ]; then
+    FRACTION=$(awk "BEGIN{printf \"%.2f\", $PCT/100}")
+    swayosd-client --custom-progress "$FRACTION" --custom-icon display-brightness-symbolic --custom-progress-text "${PCT}%"
+fi

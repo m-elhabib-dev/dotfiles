@@ -20,6 +20,8 @@ My personal Linux desktop and development environment configuration files.
 ```text
 .
 ├── alacritty/
+├── bin/          # custom scripts, linked into ~/.local/bin by install.sh
+├── eww/
 ├── fish/
 ├── mako/
 ├── nvim/
@@ -27,8 +29,29 @@ My personal Linux desktop and development environment configuration files.
 ├── waybar/
 ├── wofi/
 ├── yazi/
+├── install.sh
 └── starship.toml
 ```
+
+## Scripts
+
+Custom scripts live in `bin/<group>/` and are symlinked (flat) into `~/.local/bin`, so configs call them as `~/.local/bin/<name>`:
+
+| Group | Scripts |
+|---|---|
+| `desktop/` | `wallpaper-pick` (Mod+W), `wallpaper-set`, `clock-start`, `clock-colors`, `notify-focused` |
+| `capture/` | `screenshot`, `screen-record` |
+| `system/` | `power-profile`, `power-profile-menu`, `session-menu`, `brightness`, `dev-cleanup` |
+| `sway/` | `sway-launch` (login session), `workspace-toggle`, `keyboard-layout-next` |
+| `media/` | `video-browser`, `yt-download` |
+
+On a new machine, clone this repo as `~/.config` and run:
+
+```bash
+~/.config/install.sh
+```
+
+It links every `bin/*/*` script into `~/.local/bin` and `.zshrc` into `~`, keeps any file it replaces as `<name>.bak`, and removes links left by renamed scripts. To add a script, drop it into the matching `bin/<group>/` and re-run `install.sh`.
 
 ## Installation
 

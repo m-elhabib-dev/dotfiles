@@ -80,7 +80,7 @@
         "return-type": "json",
         "interval": 1,
         "signal": 8,
-        "on-click": "~/.local/bin/record-toggle",
+        "on-click": "~/.local/bin/screen-record",
         "tooltip": true
     },
 

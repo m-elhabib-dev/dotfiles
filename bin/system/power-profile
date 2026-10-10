@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# power-profile: switch between battery and performance modes.
+# Usage: power-profile {battery|performance|toggle|status}
+
+set -u
+
+TURBO=/sys/devices/system/cpu/intel_pstate/no_turbo
+SERVICES=(docker.socket docker containerd mariadb postgresql cups.socket cups.path cups ModemManager packagekit)
+# GPU mode used in performance mode (integrated | hybrid | nvidia); override with POWERMODE_GPU=nvidia
+PERF_GPU=${POWERMODE_GPU:-hybrid}
+REBOOT_NEEDED=0
+WIFI=$(iw dev 2>/dev/null | awk '/Interface/ {print $2; exit}')
+PANEL=eDP-1
+
+set_gpu() {
+    local want=$1 cur
+    cur=$(envycontrol --query 2>/dev/null)
+    if [ "$cur" = "$want" ]; then
+        echo "    GPU already in $want mode"
+        return
+    fi
+    echo "    GPU: $cur -> $want (this rebuilds the initramfs, takes a moment)"
+    if sudo envycontrol --switch "$want"; then
+        REBOOT_NEEDED=1
+    else
+        echo "    envycontrol switch to $want FAILED" >&2
+    fi
+}
+
+status() {
+    local profile turbo bat
+    profile=$(tuned-adm active | sed 's/^Current active profile: //')
+    turbo=$([ "$(cat "$TURBO")" = 1 ] && echo off || echo on)
+    bat=$(upower -i "$(upower -e | grep -i BAT)" | awk -F': *' '/energy-rate/ {r=$2} /time to empty/ {t=$2} END {print r " draw, " t " left"}')
+    echo "tuned profile : $profile"
+    echo "turbo         : $turbo"
+    echo "governor/EPP  : $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor) / $(cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference)"
+    echo "platform      : $(cat /sys/firmware/acpi/platform_profile 2>/dev/null)"
+    echo "gpu (envy)    : $(envycontrol --query 2>/dev/null)"
+    echo "battery       : $bat"
+}
+
+# powertop --auto-tune enables USB autosuspend on mice/keyboards, making them need several clicks to wake
+keep_input_awake() {
+    local d
+    for d in /sys/bus/usb/devices/*/; do
+        grep -qs '^03$' "$d"*/bInterfaceClass 2>/dev/null && echo on | sudo tee "$d/power/control" >/dev/null
+    done
+    # internal PS/2 keyboard and I2C touchpad
+    for d in /sys/bus/serio/devices/*/power/control /sys/bus/i2c/devices/*DELL0A69*/power/control; do
+        [ -w "$d" ] || [ -e "$d" ] && echo on | sudo tee "$d" >/dev/null
+    done
+}
+
+battery() {
+    echo "==> Switching to BATTERY mode"
+    sudo tuned-adm profile powersave
+    echo 1 | sudo tee "$TURBO" >/dev/null
+    sudo systemctl stop "${SERVICES[@]}" 2>/dev/null || true
+    command -v powertop >/dev/null && sudo powertop --auto-tune >/dev/null 2>&1
+    keep_input_awake
+    rfkill block bluetooth 2>/dev/null || true
+    echo powersupersave | sudo tee /sys/module/pcie_aspm/parameters/policy >/dev/null
+    [ -n "$WIFI" ] && sudo iw dev "$WIFI" set power_save on
+    swaymsg output $PANEL mode 1920x1080@48Hz >/dev/null 2>&1 || true
+    set_gpu integrated
+}
+
+performance() {
+    echo "==> Switching to PERFORMANCE mode"
+    sudo tuned-adm profile throughput-performance
+    echo 0 | sudo tee "$TURBO" >/dev/null
+    sudo systemctl start docker containerd mariadb postgresql 2>/dev/null || true
+    rfkill unblock bluetooth 2>/dev/null || true
+    echo default | sudo tee /sys/module/pcie_aspm/parameters/policy >/dev/null
+    [ -n "$WIFI" ] && sudo iw dev "$WIFI" set power_save off
+    swaymsg output $PANEL mode 1920x1080@60Hz >/dev/null 2>&1 || true
+    set_gpu "$PERF_GPU"
+}
+
+reboot_notice() {
+    [ "$REBOOT_NEEDED" = 1 ] && echo && echo "*** GPU mode changed: REBOOT required for it to take effect ***"
+    return 0
+}
+
+is_battery_mode() {
+    [ "$(cat "$TURBO")" = 1 ]
+}
+
+case "${1:-status}" in
+    battery|bat|b)              battery; sleep 2; status; reboot_notice ;;
+    performance|perf|p)         performance; sleep 2; status; reboot_notice ;;
+    toggle|t)
+        if is_battery_mode; then performance; else battery; fi
+        sleep 2; status; reboot_notice ;;
+    status|s)                   status ;;
+    *)
+        echo "Usage: ${0##*/} {battery|performance|toggle|status}" >&2
+        exit 1 ;;
+esac
