@@ -254,3 +254,21 @@ tooltip {
     border: 1px solid @mauve;
     border-radius: 5px;
 }
+
+
+/* =========================
+   Recording indicator
+   ========================= */
+
+#custom-recording {
+    padding: 0 5px;
+}
+
+#custom-recording.recording {
+    color: @red;
+    animation: rec-blink 1.2s steps(1) infinite;
+}
+
+@keyframes rec-blink {
+    50% { color: @peach; }
+}

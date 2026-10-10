@@ -123,6 +123,7 @@ bindsym $mod+Ctrl+l resize grow width 10 px
 # Layout
 bindsym $mod+f fullscreen toggle
 #bindsym $mod+v splitv
+bindsym $mod+v exec ~/.local/bin/vview
 #bindsym $mod+h splith
 
 # Volume controls
@@ -161,13 +162,19 @@ exec_always ~/.local/bin/sway-ws-tab watch
 bindsym $mod+Tab exec ~/.local/bin/sway-ws-tab back
 bindsym $mod+Shift+Tab exec ~/.local/bin/sway-ws-tab other
 
-# Capture a portion of the screen to clipboard
-bindsym Shift+Print exec grim -g "$(slurp)" - | wl-copy
-
-# Capture full screen to a file in your Pictures folder
-bindsym Print exec grim ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).png
-
-bindsym $mod+Shift+Print exec flatpak run --env=__NV_PRIME_RENDER_OFFLOAD=1 --env=__GLX_VENDOR_LIBRARY_NAME=nvidia com.dec05eba.gpu_screen_recorder
+# Screenshots & recording (save to file + clipboard)
+#   $mod+F9        full screenshot (focused monitor)
+#   $mod+Shift+F9  area screenshot (+ swappy annotate)
+#   $mod+F10       toggle full-screen recording
+#   $mod+Shift+F10 toggle area recording
+bindsym $mod+F9 exec ~/.local/bin/screenshot full
+bindsym $mod+Shift+F9 exec ~/.local/bin/screenshot area
+bindsym $mod+F10 exec ~/.local/bin/record-toggle full
+bindsym $mod+Shift+F10 exec ~/.local/bin/record-toggle area
+# Print-key aliases
+bindsym Print exec ~/.local/bin/screenshot full
+bindsym Shift+Print exec ~/.local/bin/screenshot area
+bindsym $mod+Print exec ~/.local/bin/record-toggle full
 
 # My apps
 bindsym $mod+i exec firefox
@@ -189,12 +196,6 @@ bindsym $mod+w exec ~/.local/bin/wofi-wallpaper
 
 # Clipboard History
 bindsym $mod+Control+c exec clipman pick -t wofi
-
-# Toggle recording a selected area
-bindsym $mod+Shift+r exec ~/.local/bin/record-toggle
-
-# Record the entire screen
-bindsym $mod+Print exec wf-recorder -f ~/Videos/full_$(date +%Y%m%d_%H%M%S).mp4
 
 bindsym $mod+space exec ~/.local/bin/switch_layout
 

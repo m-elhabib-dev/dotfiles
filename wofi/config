@@ -1,11 +1,11 @@
-width=500
-height=600
+width=700
+height=800
 location=center
 show=drun
 prompt=Search Apps...
 filter_rate=100
 allow_images=true
-image_size=24
+image_size=48
 term=alacritty
 hide_scroll=true
 print_command=true

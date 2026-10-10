@@ -7,6 +7,7 @@
         "sway/workspaces",
         "custom/powermode",
         "custom/sep",
+        "custom/recording",
         "network"
     ],
     "modules-right": [
@@ -55,7 +56,7 @@
 },
     "custom/cpu": {
         "exec": "~/.config/waybar/scripts/cpu.sh",
-        "interval": 5,
+        "interval": 10,
         "tooltip": false
     },
 
@@ -74,9 +75,18 @@
         "interval": 5
     },
 
+    "custom/recording": {
+        "exec": "~/.config/waybar/scripts/recording.sh",
+        "return-type": "json",
+        "interval": 1,
+        "signal": 8,
+        "on-click": "~/.local/bin/record-toggle",
+        "tooltip": true
+    },
+
     "custom/gpu": {
         "exec": "~/.config/waybar/scripts/gpu.sh",
-        "interval": 5,
+        "interval": 10,
         "tooltip": false
     },
 
@@ -86,6 +96,7 @@
     },
 
     "battery": {
+        "interval": 2,
         "states": {
             "warning": 30,
             "critical": 15

@@ -1,3 +1,5 @@
+output=HDMI-A-1
+layer=overlay
 # Global Settings
 font=SF Pro Display 11
 background-color=#1e1e2e
