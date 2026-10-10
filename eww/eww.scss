@@ -1,7 +1,4 @@
-// Catppuccin Mocha, matching sway/waybar
-$text: #cdd6f4;
-$subtext0: #a6adc8;
-$lavender: #b4befe;
+// text colors come from the wallpaper (eww-wallpaper-tone sets time_color/date_color)
 
 * {
     all: unset;
@@ -16,7 +13,6 @@ window {
 }
 
 .time {
-  color: $lavender;
   font-family: "JetBrains Mono";
   font-size: 128px;
   font-weight: bold;
@@ -24,16 +20,16 @@ window {
 }
 
 .date {
-  color: $subtext0;
   font-family: "JetBrains Mono";
   font-size: 28px;
   font-weight: bold;
+  margin-top: -16px;
   text-shadow: 0 1px 8px rgba(17, 17, 27, 0.7);
 }
 
-// light wallpaper: dark text
-.light .time { color: #313244; text-shadow: 0 1px 8px rgba(205, 214, 244, 0.5); }
-.light .date { color: #11111b; text-shadow: 0 1px 8px rgba(205, 214, 244, 0.5); }
+// light wallpaper: dark text, so a light glow instead of a dark shadow
+.light .time { text-shadow: 0 1px 8px rgba(205, 214, 244, 0.5); }
+.light .date { text-shadow: 0 1px 8px rgba(205, 214, 244, 0.5); }
 
 // everything transparent
 window, window.background, box, label, .clock-box {

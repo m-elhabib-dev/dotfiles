@@ -137,7 +137,7 @@ bindsym $mod+f fullscreen toggle
 # volume and brightness control using swayosd
 exec swayosd-server
 
-# desktop clock widget (eww, background layer)
+# desktop clock widget (eww, bottom layer)
 exec_always ~/.local/bin/eww-start
 
 bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
@@ -229,7 +229,7 @@ exec_always {
 }
 
 # exec swaybg -i /home/pasha/sources/wallpapers/wallpaper2.jpg -m fill
-exec swaybg -i /home/pasha/sources/wallpapers/wallpaper.png -m fill
+exec_always ~/.local/bin/wallpaper-set
 
 
 # Lock the screen after 5 minutes, turn off display after 10

@@ -1,24 +1,26 @@
 (defpoll time :interval "1s" `date +%H:%M`)
 (defpoll date :interval "60s" `date "+%A, %B %-d"`)
 (defvar tone "dark")
+(defvar time_color "#b4befe")
+(defvar date_color "#a6adc8")
 
 (defwindow clock [mon]
   :monitor mon
-  :stacking "bg"
+  :stacking "bottom"
   :focusable false
   :exclusive false
   :windowtype "desktop"
   :geometry (geometry
     :x "0px"
-    :y "90px"
-    :anchor "top center"
+    :y "50px"
+    :anchor "bottom center"
     :width "560px"
     :height "300px")
 
   (box :class "clock-box ${tone}"
        :orientation "v"
        :halign "center"
-       :valign "start"
+       :valign "end"
        :space-evenly false
-    (label :class "time" :halign "center" :text time)
-    (label :class "date" :halign "center" :text date)))
+    (label :class "time" :halign "center" :style "color: ${time_color};" :text time)
+    (label :class "date" :halign "center" :style "color: ${date_color};" :text date)))
