@@ -8,6 +8,9 @@ TURBO=/sys/devices/system/cpu/intel_pstate/no_turbo
 SERVICES=(docker.socket docker containerd mariadb postgresql cups.socket cups.path cups ModemManager packagekit)
 # GPU mode used in performance mode (integrated | hybrid | nvidia); override with POWERMODE_GPU=nvidia
 PERF_GPU=${POWERMODE_GPU:-hybrid}
+BAT=/sys/class/power_supply/BAT0
+# battery charge mode used in performance mode (Fast | Standard | Adaptive | Trickle); override with POWERMODE_CHARGE=Standard
+PERF_CHARGE=${POWERMODE_CHARGE:-Fast}
 REBOOT_NEEDED=0
 WIFI=$(iw dev 2>/dev/null | awk '/Interface/ {print $2; exit}')
 PANEL=eDP-1
@@ -38,6 +41,7 @@ status() {
     echo "platform      : $(cat /sys/firmware/acpi/platform_profile 2>/dev/null)"
     echo "gpu (envy)    : $(envycontrol --query 2>/dev/null)"
     echo "battery       : $bat"
+    echo "charging      : $(cat "$BAT/charge_types") start/end $(cat "$BAT/charge_control_start_threshold")/$(cat "$BAT/charge_control_end_threshold"), $(cat "$BAT/status") $(cat "$BAT/capacity")%"
 }
 
 # powertop --auto-tune enables USB autosuspend on mice/keyboards, making them need several clicks to wake
@@ -63,6 +67,12 @@ battery() {
     echo powersupersave | sudo tee /sys/module/pcie_aspm/parameters/policy >/dev/null
     [ -n "$WIFI" ] && sudo iw dev "$WIFI" set power_save on
     swaymsg output $PANEL mode 1920x1080@48Hz >/dev/null 2>&1 || true
+    # Dell has no inhibit-charge; Custom 50-55% (firmware minimum) keeps it from charging off the powerbank
+    # end before start so the required 5% gap holds
+    echo 55 | sudo tee "$BAT/charge_control_end_threshold" >/dev/null
+    echo 50 | sudo tee "$BAT/charge_control_start_threshold" >/dev/null
+    echo Custom | sudo tee "$BAT/charge_types" >/dev/null
+    echo "    battery charging: held (Custom 50-55%, runs on external power)"
     set_gpu integrated
 }
 
@@ -75,6 +85,8 @@ performance() {
     echo default | sudo tee /sys/module/pcie_aspm/parameters/policy >/dev/null
     [ -n "$WIFI" ] && sudo iw dev "$WIFI" set power_save off
     swaymsg output $PANEL mode 1920x1080@60Hz >/dev/null 2>&1 || true
+    echo "$PERF_CHARGE" | sudo tee "$BAT/charge_types" >/dev/null
+    echo "    battery charging: normal ($PERF_CHARGE)"
     set_gpu "$PERF_GPU"
 }
 
