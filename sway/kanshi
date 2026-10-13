@@ -1,0 +1,12 @@
+# Output profiles for kanshi (started from sway/config)
+# Laptop alone: native scale. External monitor plugged in: enlarge the laptop panel.
+
+profile laptop {
+    output eDP-1 enable scale 1 position 0,0
+}
+
+# eDP-1 at 1.25 is 1536x864 logical, so HDMI starts at x=1536
+profile docked {
+    output eDP-1 enable scale 1.25 position 0,0
+    output HDMI-A-1 enable scale 1 position 1536,0
+}

@@ -55,8 +55,9 @@ bindsym $mod+d exec wofi --show drun
 # Bar Toggle (Press Super+Shift+B if the bar disappears)
 bindsym $mod+Shift+B exec pkill waybar & waybar
 
-output eDP-1 scale 1 pos 0 0
-output HDMI-A-1 scale 1 pos 1920 0
+# Per-monitor scaling profiles (see sway/kanshi)
+exec kanshi -c ~/.config/sway/kanshi
+exec_always kanshictl reload
 
 # Input Settings
 input "type:touchpad" {

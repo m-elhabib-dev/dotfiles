@@ -57,6 +57,12 @@ box.modules-right {
     min-width: 1051px;
 }
 
+/* Docked, the laptop panel is only 1536px wide (scale 1.25, see sway/kanshi);
+   618+1051 would push the bar past it onto the external monitor */
+window#waybar.eDP-1 box.modules-left {
+    min-width: 0;
+}
+
 
 /* =========================
    Workspaces
