@@ -178,6 +178,7 @@ bindsym $mod+Print exec ~/.local/bin/screen-record full
 # My apps
 bindsym $mod+i exec firefox
 bindsym $mod+e exec nautilus 
+bindsym $mod+Shift+P exec ~/.cargo/bin/patrak
 
 # Power Operations Menu
 bindsym $mod+Shift+BackSpace exec ~/.local/bin/session-menu
