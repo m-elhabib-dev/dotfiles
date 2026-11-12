@@ -22,7 +22,7 @@ My personal Linux desktop and development environment configuration files.
 ├── alacritty/
 ├── bin/          # custom scripts, linked into ~/.local/bin by install.sh
 ├── eww/
-├── tmux/
+├── tmux.conf
 ├── mako/
 ├── nvim/
 ├── sway/
@@ -59,7 +59,7 @@ Then log out and pick **Sway** on the login screen (or run `sway-launch` from a 
 
 `install.sh` sets up everything in one go and is safe to re-run:
 
-- links the configs into `~/.config`, `.zshrc` and `tmux/tmux.conf` into `~`, and `bin/*/*` into `~/.local/bin` (anything it replaces is kept as `<name>.bak`)
+- links the configs into `~/.config`, `.zshrc` and `tmux.conf` into `~`, and `bin/*/*` into `~/.local/bin` (anything it replaces is kept as `<name>.bak`)
 - enables RPM Fusion and the swayosd/yazi COPRs, installs every package the configs and scripts use
 - installs Rust (rust-analyzer, rustfmt, stylua) and builds eww
 - oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting, zsh as login shell, `/etc/doas.conf` (`sudo` is aliased to `doas`)

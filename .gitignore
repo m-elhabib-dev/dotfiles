@@ -11,8 +11,7 @@
 !alacritty/
 !alacritty/**
 
-!tmux/
-!tmux/**
+!tmux.conf
 
 !starship.toml
 

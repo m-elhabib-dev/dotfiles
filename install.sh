@@ -24,6 +24,8 @@ step() {  # step <description> <function>
 link() {  # link <repo path> <target>
     local src="$REPO/$1" dst="$2" bak
     [[ -L $dst && $(readlink "$dst") == "$src" ]] && return
+    # an old link into this repo (file moved/renamed) is just replaced, not backed up
+    [[ -L $dst && $(readlink "$dst") == "$REPO"/* ]] && rm "$dst"
     if [[ -e $dst || -L $dst ]]; then
         bak="$dst.bak"
         [[ -e $bak || -L $bak ]] && bak="$dst.bak.$(date +%s)"
@@ -38,12 +40,13 @@ link() {  # link <repo path> <target>
 link_all() {
     # configs (no-op when the repo itself is ~/.config)
     if [[ $REPO != "$HOME/.config" ]]; then
+        # tmux.conf goes to ~/.tmux.conf only: under ~/.config/tmux, tpm would look for plugins there
         for c in alacritty eww kitty mako nvim sway waybar wofi yazi starship.toml; do
             [[ -e $c ]] && link "$c" "$HOME/.config/$c"
         done
     fi
     link .zshrc "$HOME/.zshrc"
-    link tmux/tmux.conf "$HOME/.tmux.conf"
+    link tmux.conf "$HOME/.tmux.conf"
 
     chmod +x bin/*/* waybar/scripts/*
     for f in bin/*/*; do link "$f" "$HOME/.local/bin/${f##*/}"; done
@@ -171,7 +174,7 @@ tmux_plugins() {
     # clone the @plugin entries from tmux.conf directly (what tpm's prefix+I would do)
     local dir=$HOME/.tmux/plugins p rc=0
     mkdir -p "$dir"
-    for p in $(grep -oP "^set -g @plugin '\K[^']+" tmux/tmux.conf); do
+    for p in $(grep -oP "^set -g @plugin '\K[^']+" tmux.conf); do
         [[ -d $dir/${p#*/} ]] || git clone --depth=1 "https://github.com/$p" "$dir/${p#*/}" || rc=1
     done
     return $rc
