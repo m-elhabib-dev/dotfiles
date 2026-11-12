@@ -45,3 +45,6 @@
 !bin/**
 
 !install.sh
+
+!wallpapers/
+!wallpapers/**

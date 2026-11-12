@@ -5,7 +5,7 @@ My personal Linux desktop and development environment configuration files.
 ## Environment
 
 * OS: Fedora Linux
-* Shell: Fish
+* Shell: Zsh (oh-my-zsh) + tmux
 * Terminal: Alacritty
 * Editor: Neovim
 * Window Manager: Sway
@@ -22,7 +22,7 @@ My personal Linux desktop and development environment configuration files.
 ├── alacritty/
 ├── bin/          # custom scripts, linked into ~/.local/bin by install.sh
 ├── eww/
-├── fish/
+├── tmux/
 ├── mako/
 ├── nvim/
 ├── sway/
@@ -30,7 +30,8 @@ My personal Linux desktop and development environment configuration files.
 ├── wofi/
 ├── yazi/
 ├── install.sh
-└── starship.toml
+├── starship.toml
+└── wallpapers/
 ```
 
 ## Scripts
@@ -45,36 +46,27 @@ Custom scripts live in `bin/<group>/` and are symlinked (flat) into `~/.local/bi
 | `sway/` | `sway-launch` (login session), `workspace-toggle`, `keyboard-layout-next` |
 | `media/` | `video-browser`, `yt-download` |
 
-On a new machine, clone this repo as `~/.config` and run:
+To add a script, drop it into the matching `bin/<group>/` and run `./install.sh --links`.
+
+## Installation (Fedora 41+)
 
 ```bash
-~/.config/install.sh
+git clone https://github.com/m-elhabib-dev/dotfiles.git ~/dotfiles
+~/dotfiles/install.sh
 ```
 
-It links every `bin/*/*` script into `~/.local/bin` and `.zshrc` into `~`, keeps any file it replaces as `<name>.bak`, and removes links left by renamed scripts. To add a script, drop it into the matching `bin/<group>/` and re-run `install.sh`.
+Then log out and pick **Sway** on the login screen (or run `sway-launch` from a TTY).
 
-## Installation
+`install.sh` sets up everything in one go and is safe to re-run:
 
-Clone the repository:
+- links the configs into `~/.config`, `.zshrc` and `tmux/tmux.conf` into `~`, and `bin/*/*` into `~/.local/bin` (anything it replaces is kept as `<name>.bak`)
+- enables RPM Fusion and the swayosd/yazi COPRs, installs every package the configs and scripts use
+- installs Rust (rust-analyzer, rustfmt, stylua) and builds eww
+- oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting, zsh as login shell, `/etc/doas.conf` (`sudo` is aliased to `doas`)
+- tmux plugins, the MacTahoe GTK/icon/cursor themes (as `Tahoe-Neo`), JetBrainsMono Nerd Font, the default wallpaper (`wallpapers/hp.jpg` → `~/sources/wallpapers`)
+- Neovim plugins (pinned by `nvim/lazy-lock.json`)
 
-```bash
-git clone https://github.com/m-elhabib-dev/dotfiles.git
-cd dotfiles
-```
-
-Create symbolic links:
-
-```bash
-ln -sf $(pwd)/nvim ~/.config/nvim
-ln -sf $(pwd)/alacritty ~/.config/alacritty
-ln -sf $(pwd)/fish ~/.config/fish
-ln -sf $(pwd)/sway ~/.config/sway
-ln -sf $(pwd)/waybar ~/.config/waybar
-ln -sf $(pwd)/wofi ~/.config/wofi
-ln -sf $(pwd)/mako ~/.config/mako
-ln -sf $(pwd)/yazi ~/.config/yazi
-ln -sf $(pwd)/starship.toml ~/.config/starship.toml
-```
+A step that fails doesn't stop the run; failed steps are listed at the end. `./install.sh --links` only redoes the linking.
 
 ## Included Configurations
 
@@ -105,7 +97,7 @@ ln -sf $(pwd)/starship.toml ~/.config/starship.toml
 
 * Alacritty configuration
 * Starship prompt
-* Fish shell customizations
+* Zsh + tmux
 
 ## License
 
