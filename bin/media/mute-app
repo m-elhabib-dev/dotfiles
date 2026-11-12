@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Toggle mute on the audio streams of the currently focused Sway window only.
+
+focused=$(swaymsg -t get_tree | jq -c '[.. | select(.focused? == true)] | .[0]')
+pid=$(jq -r '.pid // empty' <<<"$focused")
+app=$(jq -r '.app_id // .window_properties.class // .name // "app"' <<<"$focused")
+
+notify() {
+    notify-send -t 1500 -h string:x-canonical-private-synchronous:mute-app "$1"
+}
+
+# focused PID plus all descendants
+descendants() {
+    local p
+    echo "$1"
+    for p in $(pgrep -P "$1" 2>/dev/null); do
+        descendants "$p"
+    done
+}
+
+pids=$([[ -n $pid ]] && descendants "$pid" | jq -R . | jq -sc .)
+[[ -z $pids ]] && pids='[]'
+
+inputs=$(pactl -f json list sink-inputs 2>/dev/null)
+
+ids=$(jq -r --argjson pids "$pids" --arg app "${app,,}" '
+    def p: .properties;
+    ([.[] | select((p["application.process.id"] // "") as $x | $pids | index($x)) | .index]) as $byPid
+    | if ($byPid | length) > 0 then $byPid[]
+      else .[] | select(
+          ((p["application.process.binary"] // "" | ascii_downcase) == $app) or
+          ((p["application.name"] // "" | ascii_downcase) == $app)
+      ) | .index
+      end
+' <<<"$inputs")
+
+if [[ -z $ids ]]; then
+    notify "No audio stream for $app"
+    exit 0
+fi
+
+# any unmuted -> mute all; otherwise unmute all
+any_unmuted=$(jq -r --argjson ids "$(printf '%s\n' $ids | jq -sc .)" \
+    '[.[] | select(.index as $i | $ids | index($i)) | select(.mute == false)] | length' <<<"$inputs")
+
+if (( any_unmuted > 0 )); then
+    state=1; msg="Muted"
+else
+    state=0; msg="Unmuted"
+fi
+
+for id in $ids; do
+    pactl set-sink-input-mute "$id" "$state"
+done
+
+notify "$msg: $app"

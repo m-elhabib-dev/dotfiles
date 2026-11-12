@@ -230,7 +230,9 @@ alias yt-dlp='yt-download'
 alias nit='/home/pasha/Rust/nit/target/release/nit'
 alias e='exit'
 
+alias sway-which="swaymsg -t subscribe -m '[\"window\"]' | jq -r 'select(.change==\"focus\") | .container.app_id // .container.window_properties.class'"
 
+alias mac='reims-ctl start mac'
 
 # opencode
 export PATH=/home/pasha/.opencode/bin:$PATH
@@ -246,3 +248,14 @@ export ANDROID_HOME=$HOME/Android/Sdk
 if [[ -z "$TMUX" && -o interactive ]]; then
     exec tmux
 fi
+
+# Ctrl+K: clear screen and scrollback (also clears tmux pane history)
+clear-screen-and-scrollback() {
+  printf '\e[H\e[2J\e[3J'
+  [[ -n $TMUX ]] && tmux clear-history
+  zle reset-prompt
+}
+zle -N clear-screen-and-scrollback
+bindkey '^K' clear-screen-and-scrollback
+
+

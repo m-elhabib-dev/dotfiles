@@ -70,6 +70,9 @@ input type:keyboard {
     xkb_layout "us,ara"
     xkb_options caps:super
 }
+
+# disable touchpad from dual shock 4 
+input "1356:2508:Wireless_Controller_Touchpad" events disabled
 #bindsym $mod+space input type:keyboard xkb_switch_layout next
 # Moving around
 #bindsym $mod+Left focus left
@@ -123,9 +126,9 @@ bindsym $mod+Ctrl+l resize grow width 10 px
 
 # Layout
 bindsym $mod+f fullscreen toggle
-#bindsym $mod+v splitv
-bindsym $mod+v exec ~/.local/bin/video-browser
-#bindsym $mod+h splith
+bindsym $mod+v splitv
+#bindsym $mod+v exec ~/.local/bin/video-browser
+bindsym $mod+b splith
 
 # Volume controls
 #bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
@@ -139,12 +142,18 @@ bindsym $mod+v exec ~/.local/bin/video-browser
 # volume and brightness control using swayosd
 exec swayosd-server
 
+# freelance sites on login (hourly khamsat reopen: khamsat-open.timer)
+exec firefox-ws1 https://khamsat.com/community/requests https://mostaql.com/projects
+
 # desktop clock widget (eww, bottom layer)
 exec_always ~/.local/bin/clock-start
 
 bindsym XF86AudioRaiseVolume exec swayosd-client --output-volume raise
 bindsym XF86AudioLowerVolume exec swayosd-client --output-volume lower
 bindsym XF86AudioMute exec swayosd-client --output-volume mute-toggle
+# Mute only the focused window's app
+bindsym $mod+m exec ~/.local/bin/mute-app
+bindsym $mod+XF86AudioMute exec ~/.local/bin/mute-app
 
 # brightness adjusts the internal panel (brightnessctl) and any DDC/CI
 # external monitors (ddcutil) together, then shows one swayosd OSD
@@ -261,3 +270,9 @@ exec_always --no-startup-id slack
 assign [class="Google-chrome"] workspace number 9
 assign [class="google-chrome"] workspace number 9
 assign [app_id="google-chrome"] workspace number 9
+
+for_window [app_id="mpv" title="^webcam$"] floating enable, sticky enable, border none
+
+# webcam circle: bigger / smaller
+bindsym $mod+Prior [title="^webcam$"] resize grow width 100 px, resize grow height 100 px
+bindsym $mod+Next [title="^webcam$"] resize shrink width 100 px, resize shrink height 100 px

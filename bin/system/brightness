@@ -19,6 +19,17 @@ if command -v brightnessctl >/dev/null && brightnessctl -c backlight -l >/dev/nu
     brightnessctl -c backlight set "${STEP}%$([ "$SIGN" = 1 ] && echo + || echo -)" >/dev/null 2>&1
 fi
 
+# The HP monitor behind the USB-C hub (DP-*) can't be reached over DDC/CI, because
+# the hub's converter drops it, so it is dimmed in software instead. On the built-in
+# HDMI port it is HDMI-A-1 and takes the normal ddcutil path below.
+if swaymsg -t get_outputs -r 2>/dev/null \
+    | jq -e 'any(.[]; .active and (.name | startswith("DP-")) and .model == "HP 524sf")' >/dev/null; then
+    PCT=$("$HOME/.local/bin/hub-dim" step $(( SIGN * STEP )))
+    FRACTION=$(awk "BEGIN{printf \"%.2f\", $PCT/100}")
+    swayosd-client --custom-progress "$FRACTION" --custom-icon display-brightness-symbolic --custom-progress-text "${PCT}%"
+    exit 0
+fi
+
 # `ddcutil detect` does a full I2C bus scan and can take 30-60s+, so the
 # external monitors' bus numbers are detected once and cached, instead of
 # rescanning on every key press.

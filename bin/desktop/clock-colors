@@ -2,8 +2,8 @@
 # Set eww clock colors from the wallpaper: tone (light|dark) from brightness behind the clock
 # (bottom-center), text colors from the wallpaper's most vivid prominent color.
 img="$1"
-[[ -f "$img" ]] || exit 0
-mean=$(magick "$img" -gravity south -crop 40%x30%+0+0 +repage -colorspace Gray -format "%[fx:mean]" info: 2>/dev/null) || exit 0
+[[ -f "$img" ]] || { echo "clock-colors: no wallpaper image: '$img'" >&2; exit 0; }
+mean=$(magick "$img" -gravity south -crop 40%x30%+0+0 +repage -colorspace Gray -format "%[fx:mean]" info: 2>/dev/null) || { echo "clock-colors: magick failed on $img" >&2; exit 0; }
 tone=dark
 awk -v m="$mean" 'BEGIN{exit !(m>0.55)}' && tone=light
 
@@ -31,4 +31,8 @@ elif [[ $tone == light ]]; then
 else
     time_color=$(shade 0.80 "max(u,0.5)") date_color=$(shade 0.70 "u*0.6")
 fi
-eww update tone="$tone" time_color="$time_color" date_color="$date_color"
+# Persist to a file eww polls (eww.yuck), so the colors survive eww config reloads (monitor hotplug)
+cache="$HOME/.cache/eww-clock-colors.json"
+json=$(printf '{"tone":"%s","time":"%s","date":"%s"}' "$tone" "$time_color" "$date_color")
+printf '%s\n' "$json" > "$cache.tmp" && mv "$cache.tmp" "$cache"
+eww update colors="$json"

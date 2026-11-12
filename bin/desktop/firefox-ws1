@@ -1,0 +1,28 @@
+#!/bin/bash
+# Open URLs in a NEW Firefox window (first as a window, the rest as tabs in it)
+# and move that window to workspace 1.
+# Usage: firefox-ws1 URL...
+
+export SWAYSOCK=${SWAYSOCK:-$(ls /run/user/"$UID"/sway-ipc.*.sock 2>/dev/null | head -1)}
+
+window_ids() {
+    swaymsg -t get_tree | jq -r '.. | objects | select(.app_id? == "org.mozilla.firefox") | .id' | sort
+}
+
+before=$(window_ids)
+
+args=(--new-window "$1")
+shift
+for url in "$@"; do args+=(--new-tab "$url"); done
+
+firefox "${args[@]}" &
+
+for _ in $(seq 100); do
+    new=$(comm -13 <(echo "$before") <(window_ids) | head -1)
+    if [ -n "$new" ]; then
+        swaymsg "[con_id=$new] move container to workspace number 1" >/dev/null
+        break
+    fi
+    sleep 0.2
+done
+wait

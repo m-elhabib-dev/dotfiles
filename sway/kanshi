@@ -10,3 +10,12 @@ profile docked {
     output eDP-1 enable scale 1.25 position 0,0
     output HDMI-A-1 enable scale 1 position 1536,0
 }
+
+# Same monitor through the USB-C hub (shows up as DP-*, not HDMI-A-1).
+# 75.028Hz is deliberate: the hub's DP-to-HDMI converter makes 60Hz and 100Hz look
+# washed out, because i915 sends limited-range RGB for those CEA timings.
+profile hub {
+    output eDP-1 enable scale 1.25 position 0,0
+    output "HP Inc. HP 524sf 0x01010101" enable mode 1920x1080@75.028Hz scale 1 position 1536,0
+    exec ~/.local/bin/hub-dim run
+}

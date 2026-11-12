@@ -1,12 +1,20 @@
 #!/bin/bash
 # screen-record [full|area] -> start/stop screen recording (H.264/AAC MP4, 1080p max, 30fps)
 state="${XDG_RUNTIME_DIR:-/tmp}/record-toggle.file"
+mods="${XDG_RUNTIME_DIR:-/tmp}/record-toggle.modules"
 bar() { pkill -RTMIN+8 -x waybar; }
+
+# remove the virtual mix sink and its loopbacks
+unload_mix() {
+    [ -s "$mods" ] && xargs -r -n1 pactl unload-module < "$mods"
+    rm -f "$mods"
+}
 
 if pgrep -x wf-recorder >/dev/null; then
     pkill -INT -x wf-recorder
     "$HOME/.local/bin/notify-focused" -a Recording -i media-record -h string:x-canonical-private-synchronous:rec "Recording stopped" "Finalizing video..."
     while pgrep -x wf-recorder >/dev/null; do sleep 0.2; done
+    unload_mix
     file=$(cat "$state" 2>/dev/null)
     # move the moov atom to the front so it streams/plays everywhere
     if [ -s "$file" ] && ffmpeg -v error -y -i "$file" -c copy -movflags +faststart "$file.tmp.mp4"; then
@@ -36,10 +44,18 @@ case "${1:-full}" in
     *) echo "usage: screen-record [full|area]" >&2; exit 2 ;;
 esac
 
-# system audio = monitor of the default sink
+# system audio (monitor of the default sink) + default mic, mixed into one virtual source
 sink=$(pactl get-default-sink 2>/dev/null)
+src=$(pactl get-default-source 2>/dev/null)
 audio=()
-[ -n "$sink" ] && audio=(--audio="${sink}.monitor" --audio-backend=pulse -C aac)
+: > "$mods"
+if id=$(pactl load-module module-null-sink sink_name=rec_mix sink_properties=device.description=rec_mix 2>/dev/null); then
+    echo "$id" >> "$mods"
+    for from in "${sink:+$sink.monitor}" "$src"; do
+        [ -n "$from" ] && pactl load-module module-loopback source="$from" sink=rec_mix latency_msec=30 >> "$mods" 2>/dev/null
+    done
+    audio=(--audio=rec_mix.monitor --audio-backend=pulse -C aac)
+fi
 
 echo "$file" > "$state"
 setsid -f wf-recorder "${target[@]}" "${audio[@]}" -f "$file" \
@@ -51,5 +67,6 @@ if pgrep -x wf-recorder >/dev/null; then
     bar
     "$HOME/.local/bin/notify-focused" -a Recording -i media-record -h string:x-canonical-private-synchronous:rec "Recording started" "$(basename "$file")  -  press Super+F10 to stop"
 else
+    unload_mix
     "$HOME/.local/bin/notify-focused" -u critical -a Recording -i dialog-error "Recording failed" "wf-recorder did not start"
 fi
